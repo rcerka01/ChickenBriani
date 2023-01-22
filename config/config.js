@@ -11,15 +11,15 @@ module.exports = {
         join: ",\ "
     },
 
-    year: {
-        from: 2023,
-        to: 2023
-    },
+    // year: {
+    //     from: 2023,
+    //     to: 2023
+    // },
 
-    closingHour: 22,
+    // closingHour: 22,
 
-    // 1D 4H 1H
-    timeGap: "1D",
+    // // 1D 4H 1H
+    // timeGap: "1D",
 
     mapper: currencies.mapper,
 

@@ -1,6 +1,55 @@
 const conf = require("../config/config");
-//const fileController = require("./fileController")
-const fs = require('fs')
+const fs = require('fs');
+
+// used in formLines function
+// 86400000 one day in milliseconds, needed because of Team Wiever error
+function convertDateFromUnixTimestamp(unixTimestamp) {
+    var date = new Date(unixTimestamp * 1000 + 86400000);
+    return "[" + date.toLocaleDateString("en-UK") + "]"
+}
+      
+function convertTimeFromUnixTimestamp(unixTimestamp) {
+    var date = new Date(unixTimestamp * 1000 + 86400000);
+    return "[" + date.toLocaleTimeString("en-UK") + "]"
+}
+
+function dateToYear(date) {
+    return date.split("/")[2].slice(0, -1)
+}
+
+function getWeekdayFromUnixTimestamp(unixTimestamp) {
+    var date = new Date(unixTimestamp * 1000 + 86400000);
+    var weekdays = ["Su","Mo","Tu","We","Th","Fr","Sa",]
+    return weekdays[date.getDay()]
+}
+
+// used in rawOutput
+function getMarginGbp(currency) {
+    return currency.lot / currency.leverage * currency.value * currency.marginToGBP
+}
+
+function createTitle(currency) {
+    return currency.name + "<br> margin: " + getMarginGbp(currency).toFixed(2) + 
+        " pip: "    + currency.pip + " or " + getOnePipValueGbp(currency).toFixed(2) + " gbp"
+}
+
+function getOnePipValueGbp(currency) {
+    return currency.lot * currency.value * currency.pip * currency.pipToGBP
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////
 
 function arrSum(val) {
     if (val.length > 0) {
@@ -8,17 +57,11 @@ function arrSum(val) {
     } else return 0
 }
 
-function dateToYear(date) {
-    return date.split("/")[2].slice(0, -1) // .split(" ")[0]
- }
-
 function dateToMonth(date) {
     return date.split("/")[0].substring(1)
 }
 
-function getMarginGbp(currency) {
-    return currency.lot / currency.leverage * currency.value * currency.marginToGBP
-}
+
 
 function convertToPips(val, currency) {
     return val / currency.pip
@@ -28,10 +71,7 @@ function getOnePipValueGbp(currency) {
     return currency.lot * currency.value * currency.pip * currency.pipToGBP
 }
 
-function createTitle(currency) {
-    return currency.name + "<br> margin: " + getMarginGbp(currency).toFixed(2) + 
-        " pip: "    + currency.pip + " or " + getOnePipValueGbp(currency).toFixed(2) + " gbp"
-}
+
 
 function loadCurrenciesBoolArray(bool) {
     var results = []
@@ -42,16 +82,7 @@ function loadCurrenciesBoolArray(bool) {
     return results
 }
 
-function convertDateFromUnixTimestamp(unixTimestamp) {
-    var date = new Date(unixTimestamp * 1000);
-    // date.setDate(date.getDate()+1) // move one day back
-    return "[" + date.toLocaleDateString("en-UK") + "]"
-}
 
-function convertTimeFromUnixTimestamp(unixTimestamp) {
-    var date = new Date(unixTimestamp * 1000);
-    return "[" + date.toLocaleTimeString("en-UK") + "]"
-}
 
 function convertDateFromTimestamp(ts) {
     return "[" + ts.toLocaleDateString("en-UK") + "]"
@@ -389,6 +420,8 @@ function outputAvaragesAndPositives(arr, currency) {
 }
 
 module.exports = {
+    getWeekdayFromUnixTimestamp,
+
     // small
     arrSum,
     dateToYear,
