@@ -114,15 +114,15 @@ function outputWithProfits(data) {
         "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMaxProfitInPips.toFixed() + "</td>" +
         "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMinProfitInPips.toFixed() + "</td>" +
         
-        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyProfitInGBP.toFixed(2) + "</td>" +
+        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";font-weight:bold;'>" + dailyProfitInGBP.toFixed(2) + "</td>" +
         "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMaxProfitInGBP.toFixed(2) + "</td>" +
-        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMinProfitInGBP.toFixed(2) + "</td>" +
+        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";font-weight:bold;'>" + dailyMinProfitInGBP.toFixed(2) + "</td>" +
 
         "<td>" + takenProfitInPips.toFixed()  + "</td>" +
         "<td " + takenProfitStyle + ">" + takenProfitInGBP.toFixed(2)  + "</td>" +
-        "<td>" + element.isOpen + "</td>" +
         "</tr>"
     })
+
     output = output + "</table>"
 
     return output
