@@ -1,12 +1,13 @@
-const singleController = require("./singleController")
-const fileController   = require("./fileController")
 const conf             = require("../config/config");
 const fs               = require('fs')
+const singleController = require("./singleController")
+const dataController   = require("./dataController")
+const outputController   = require("./outputController")
 
 async function getData(currency, step, yearFrom, yearTo) { 
   var path = conf.fileName.path + conf.fileName.prefix + currency + conf.fileName.join + step + ".csv"
   var currencyData = conf.mapper.find(c => c.name == currency)
-  var items = await fileController.readFile(path, yearFrom, yearTo)
+  var items = await dataController.readFile(path, yearFrom, yearTo)
   return { items, currencyData }
 }
 
@@ -45,7 +46,7 @@ module.exports = { run: function (app) {
     var yearTo   = req.params.yearto;
 
     var data = await getData(currency, step, yearFrom, yearTo)
-    var output = fileController.rawOutput(data.items.days, data.currencyData)
+    var output = outputController.rawOutput(data.items.days, data.currencyData)
     res.render("index", { output });
 
  });

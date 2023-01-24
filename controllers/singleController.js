@@ -87,47 +87,6 @@ module.exports = { run: function (data) {
     var output = currency.name + "<br>"
 
     switch (conf.single.switch) {
-        // todo to open SL mut be fixed in takeProfits()
-        // case 1:
-        //     var tp = conf.single.singleTp
-        //     var sl = conf.single.singleSl
-
-        //     var avAndPos = []
-
-        //     var profits = com.getProfits(jsonData, ci, tp, sl, currency)
-        //     var profitsByYear = com.profitsByYearArr(profits)
-        //     avAndPos.push(com.countAvaregesAndPositives(profitsByYear, tp, sl))
-
-        //     output = com.outputAvaragesAndPositives(com.sortAvaragesAndPositives(avAndPos), currency)
-        //            +com.outputProfitsByYear(profitsByYear, tp, sl, currency) 
-        //            + outputProfits(profits, currency)
-        // break
-
-        // case 2:
-        //     var startTp = conf.single.multipleTP.start
-        //     var stopTp = conf.single.multipleTP.stop
-        //     var stepTp = conf.single.multipleTP.step
-           
-        //     var startSl = conf.single.multipleSL.start
-        //     var stopSl = conf.single.multipleSL.stop
-        //     var stepSl = conf.single.multipleSL.step
-
-        //     var avAndPos = []
-        //     var outputProfitsByYear = ""
-        //     for (var i=startTp; i<=stopTp; i=i+stepTp) {
-        //         for (var ii=startSl; ii<=stopSl; ii=ii+stepSl) {
-
-        //             var profits = com.getProfits(jsonData, ci, i, ii, currency)
-        //             var profitsByYear = com.profitsByYearArr(profits)
-
-        //             avAndPos.push(com.countAvaregesAndPositives(profitsByYear, i, ii))
-
-        //             outputProfitsByYear = outputProfitsByYear + "<br>" +  com.outputProfitsByYear(profitsByYear, i, ii, currency) 
-        //         }
-        //     }
-
-        //     output = output + com.outputAvaragesAndPositives(com.sortAvaragesAndPositives(avAndPos), currency) + outputProfitsByYear
-        // break
 
         case 3:
             var tp = conf.single.singleTp
