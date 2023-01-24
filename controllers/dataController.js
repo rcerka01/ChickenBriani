@@ -1,10 +1,14 @@
 const com = require("./commonsController");
 const fs = require('fs');
 
-// Quick utility, transfer to number with decimal five
+/*
+ * Quick utility, transfer to number with decimal five
+ */
 function fix5(n) { return Number(n).toFixed(5) }
 
-// public
+/*
+ * Public
+ */
 const readFile = async (path, yearFrom, yearTo) => {
     try {
         const data = await fs.promises.readFile(path, 'utf8')
@@ -17,6 +21,9 @@ const readFile = async (path, yearFrom, yearTo) => {
     }
 }
 
+/*
+ * 
+ */
 function formLines(dataArray, yearFrom, yearTo) {
     var direction     = ""
     var directionFlag = ""
@@ -48,7 +55,7 @@ function formLines(dataArray, yearFrom, yearTo) {
                    fix5(nextMin) + " - " + fix5(purchase) + " = <strong>" + fix5(minProf) + "</strong>"
         }
 
-        return { profit, date, time, weekday, currentClose, direction, test, maxProf, minProf }
+        return { profit, date, time, weekday, currentClose, direction, directionFlag, test, maxProf, minProf }
     }
     //
 
@@ -108,8 +115,105 @@ function formLines(dataArray, yearFrom, yearTo) {
     return { days }
 }
 
+/*
+ * Public
+ */
+function takeProfits(data, sp, tp, sl) {
+    var currency = data.currencyData
+    var days     = data.days
+
+    var dailyProfit = 0
+    var takenProfit = 0
+    var maxProfit = 0
+    var minProfit = 0
+    var resultsArr = []
+    var isOpen = true
+
+    days.forEach( val => 
+
+        resultsArr.push(
+            {
+                date: val.date, 
+                time: val.time,
+                weekday: val.weekday,
+                currentClose: fix5(val.currentClose),
+                direction: val.direction,
+                directionFlag: val.directionFlag,
+                dailyProfit: dailyProfit,
+                takenProfit: takenProfit,
+                maxProfit: maxProfit,
+                minProfit: minProfit,
+                isOpen: isOpen
+            })
+    )
+    return { arr: resultsArr, currencyData: currency }
+}
+
+// // use native tp and sl
+// function takeProfitsPrev(arr, ci, tp, sl, currency) {
+//     var resultsArr = []
+
+//     var closeFlag = false
+//     var midCloseFlag = true
+//     var onePipValueInGbp = getOnePipValueGbp(currency)
+//     var profitFix = 0
+
+//     // deduct spread
+//     if (conf.single.deductSpread)  {
+//         var spreadToDeductInGbp = conf.single.spread
+//         var spreadToDeductInPip = conf.single.spread / onePipValueInGbp * currency.pip
+//     } else { 
+//         var spreadToDeductInGbp = 0
+//         var spreadToDeductInPip = 0
+//     }
+
+//     arr.forEach( (val, i) => {
+//         var profit =  0
+
+//         var tpInPips = tp / onePipValueInGbp * currency.pip
+//         var slInPips = sl / onePipValueInGbp * currency.pip
+
+//         // fix to add to profit if same direction signal appear
+//         if (arr[i + 1] !== void 0 && 
+//             val.directions[ci] == arr[i + 1].directions[ci] && 
+//             val.directions[ci] == val.signals[ci] &&
+//             closeFlag &&
+//             !midCloseFlag) 
+//                 { profitFix = val.profits[ci] }
+
+//         // sl
+//         if (conf.sl && !closeFlag && val.maxLoses[ci] <= slInPips) { closeFlag = true; profit = slInPips - spreadToDeductInPip; profitFix = 0  } 
+//         // tp
+//         if (conf.tp && !midCloseFlag && val.maxProfits[ci] >= tpInPips) { midCloseFlag = true; profit = tpInPips - spreadToDeductInPip; profitFix = 0 } 
+//         if (conf.tp && !closeFlag && val.maxProfits[ci] >= tpInPips) { closeFlag = true; profit = tpInPips - spreadToDeductInPip; profitFix = 0 }
+//         // norm
+//         if      (arr[i + 1] !== void 0 && val.directions[ci] != arr[i + 1].directions[ci] && (!closeFlag || !midCloseFlag)) { profit = val.profits[ci] + profitFix - spreadToDeductInPip; profitFix = 0 }
+//         else if (arr[i + 1] !== void 0 && val.directions[ci] != arr[i + 1].directions[ci])               { closeFlag = false; }
+
+//         if (val.signals[ci] !== null && val.signals[ci] !== void 0 && val.signals[ci].length > 0) { midCloseFlag = false; }
+
+//         resultsArr.push(
+//             {
+//                 date: val.date, 
+//                 shotrTime: val.shotrTime,
+//                 profitDaily: val.profits[ci],
+//                 profitMax: val.maxProfits[ci],
+//                 loseMax: val.maxLoses[ci],
+//                 profit: profit, 
+//                 direction: val.directions[ci],
+//                 signal: val.signals[ci], 
+//                 close: closeFlag,
+//                 midClose: midCloseFlag
+//             })
+        
+//     });  
+
+//     return resultsArr
+// }
+
 module.exports = {
-    readFile
+    readFile,
+    takeProfits
 }
 
 

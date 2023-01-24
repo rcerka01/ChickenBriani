@@ -1,6 +1,12 @@
 const com = require("./commonsController");
 
-function rawOutput(days, currency) {
+/*
+ * Direct output with direction turnings and test
+ */
+function rawOutput(data) {
+    var days = data.days
+    var currency = data.currencyData
+
     var pipValue = com.getOnePipValueGbp(currency)
 
     // init
@@ -45,8 +51,81 @@ function rawOutput(days, currency) {
     return output
 }
 
+/*
+ *
+ */
+function outputWithProfits(data) {
+    // init
+    var arr = data.arr
+    var currency = data.currencyData
+    var onePip = com.getOnePipValueGbp(currency)
+
+    var isOpenColor = "#000"
+    var trColor = "#fff"
+    var redgreen = "#fff"
+
+    var output = "<table><tr><th colspan=4></th>" +
+    "<th>Close</th><th>Direction</th>" +
+    "<th>Daily<br> PIPs</th><th>Max<br> PIPs</th><th>Min<br> PIPs</th>" +
+    "<th>Daily<br> GBP</th><th>Max<br>  GBP</th><th>Min<br>  GBP</th>" +
+    "<th>Taken<br>  PIPs</th><th>Taken<br> GBP</th></tr>"
+
+    arr.forEach( (element, i) => {
+
+        // colors
+        if (i % 2 == 0) trColor = "#eee"; else trColor = "#fff";
+
+        if (element.isOpen) isOpenColor = "#000"
+        else isOpenColor = "grey"; 
+
+        if (element.directionFlag == "red") redgreen = "#FFCCCB" 
+        else if (element.directionFlag == "green") redgreen = "#90EE90";
+
+        // daily profit
+        var dailyProfitInPips = com.convertToPips(element.dailyProfit, currency)
+        var dailyProfitInGBP = dailyProfitInPips * onePip
+
+        // taken profit
+        var takenProfitInPips = com.convertToPips(element.takenProfit, currency)
+        var takenProfitInGBP = takenProfitInPips * onePip
+
+        // maxProfit
+        var dailyMaxProfitInPips = com.convertToPips(element.maxProfit, currency)
+        var dailyMaxProfitInGBP = dailyMaxProfitInPips * onePip
+
+        // minProfit
+        var dailyMinProfitInPips = com.convertToPips(element.minProfit, currency)
+        var dailyMinProfitInGBP = dailyMinProfitInPips * onePip
+
+        output = output + "<tr bgcolor=" + trColor + ">" +
+        "<td>" + i + "</td>" +
+        "<td>" + element.date + "</td>" +
+        "<td>" + element.time + "</td>" +
+        "<td><strong>" + element.weekday + "</strong></td>" +
+
+        "<td><span>" + Number(element.currentClose).toFixed(5) + "</span></td>" +
+        "<td><span>" + element.direction + "</span></td>" +
+
+        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyProfitInPips.toFixed() + "</td>" +
+        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMaxProfitInPips.toFixed() + "</td>" +
+        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMinProfitInPips.toFixed() + "</td>" +
+        
+        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyProfitInGBP.toFixed(2) + "</td>" +
+        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMaxProfitInGBP.toFixed(2) + "</td>" +
+        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMinProfitInGBP.toFixed(2) + "</td>" +
+
+        "<td>" + takenProfitInPips.toFixed()  + "</td>" +
+        "<td>" + takenProfitInGBP.toFixed(2)  + "</td>" +
+        "</tr>"
+    })
+    output = output + "</table>"
+
+    return output
+}
+
 module.exports = {
     rawOutput,
+    outputWithProfits
 }
 
 
