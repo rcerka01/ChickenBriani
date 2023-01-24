@@ -37,6 +37,10 @@ function getOnePipValueGbp(currency) {
     return currency.lot * currency.value * currency.pip * currency.pipToGBP
 }
 
+function gbpToChartValue(currency, gbp) {
+    return gbp / currency.pipToGBP / currency.value / currency.lot
+}
+
 
 
 
@@ -421,6 +425,8 @@ function outputAvaragesAndPositives(arr, currency) {
 
 module.exports = {
     getWeekdayFromUnixTimestamp,
+
+    gbpToChartValue,
 
     // small
     arrSum,

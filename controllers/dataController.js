@@ -128,20 +128,52 @@ function takeProfits(data, sp, tp, sl) {
     var minProfit = 0
     var resultsArr = []
     var isOpen = true
+    var openNext = false
+
+    sp = com.gbpToChartValue(currency, sp)
+    tp = com.gbpToChartValue(currency, tp)
+    sl = com.gbpToChartValue(currency, sl)
 
     days.forEach( (val, i) => {
         takenProfit = 0
 
-        if (isOpen) dailyProfit = val.profit; else dailyProfit = 0
-        if (isOpen) maxProfit = val.maxProf; else maxProfit = 0
-        if (isOpen) minProfit = val.minProf; else minProfit = 0
+        // todo ugly
+        if (openNext) isOpen = true
 
         // take profit on dirction change
-        if (isOpen) {
-            if (days.length > i + 1 && days[i + 1].directionFlag != val.directionFlag) {
-                takenProfit = val.profit
+        if (i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
+            if (isOpen) {
+                if (val.profit - sp < tp)  takenProfit = val.profit - sp; else takenProfit = tp - sp
+            } else {
+                // todo ugly
+                openNext = true
             }
         }
+        
+        // if tp defind
+        else if (tp != 0 && isOpen) {
+            if (val.profit - sp >= tp) {
+                takenProfit = tp - sp
+                isOpen = false
+            }
+        }
+
+        // if sl defind
+        else if (sl != 0 && isOpen) {
+            if (val.profit - sp <= sl) {
+                takenProfit = sl - sp
+                isOpen = false
+            }
+        }
+
+        // dailies
+        // dailies
+        if (isOpen) maxProfit   = val.maxProf; else maxProfit = 0
+        if (isOpen) minProfit   = val.minProf; else minProfit = 0
+        dailyProfit = val.profit
+        if (isOpen) maxProfit   = val.maxProf; else maxProfit = 0
+        if (isOpen) minProfit   = val.minProf; else minProfit = 0
+        dailyProfit = val.profit
 
         resultsArr.push({
             date: val.date, 
@@ -162,88 +194,7 @@ function takeProfits(data, sp, tp, sl) {
     return { arr: resultsArr, currencyData: currency }
 }
 
-// // use native tp and sl
-// function takeProfitsPrev(arr, ci, tp, sl, currency) {
-//     var resultsArr = []
-
-//     var closeFlag = false
-//     var midCloseFlag = true
-//     var onePipValueInGbp = getOnePipValueGbp(currency)
-//     var profitFix = 0
-
-//     // deduct spread
-//     if (conf.single.deductSpread)  {
-//         var spreadToDeductInGbp = conf.single.spread
-//         var spreadToDeductInPip = conf.single.spread / onePipValueInGbp * currency.pip
-//     } else { 
-//         var spreadToDeductInGbp = 0
-//         var spreadToDeductInPip = 0
-//     }
-
-//     arr.forEach( (val, i) => {
-//         var profit =  0
-
-//         var tpInPips = tp / onePipValueInGbp * currency.pip
-//         var slInPips = sl / onePipValueInGbp * currency.pip
-
-//         // fix to add to profit if same direction signal appear
-//         if (arr[i + 1] !== void 0 && 
-//             val.directions[ci] == arr[i + 1].directions[ci] && 
-//             val.directions[ci] == val.signals[ci] &&
-//             closeFlag &&
-//             !midCloseFlag) 
-//                 { profitFix = val.profits[ci] }
-
-//         // sl
-//         if (conf.sl && !closeFlag && val.maxLoses[ci] <= slInPips) { closeFlag = true; profit = slInPips - spreadToDeductInPip; profitFix = 0  } 
-//         // tp
-//         if (conf.tp && !midCloseFlag && val.maxProfits[ci] >= tpInPips) { midCloseFlag = true; profit = tpInPips - spreadToDeductInPip; profitFix = 0 } 
-//         if (conf.tp && !closeFlag && val.maxProfits[ci] >= tpInPips) { closeFlag = true; profit = tpInPips - spreadToDeductInPip; profitFix = 0 }
-//         // norm
-//         if      (arr[i + 1] !== void 0 && val.directions[ci] != arr[i + 1].directions[ci] && (!closeFlag || !midCloseFlag)) { profit = val.profits[ci] + profitFix - spreadToDeductInPip; profitFix = 0 }
-//         else if (arr[i + 1] !== void 0 && val.directions[ci] != arr[i + 1].directions[ci])               { closeFlag = false; }
-
-//         if (val.signals[ci] !== null && val.signals[ci] !== void 0 && val.signals[ci].length > 0) { midCloseFlag = false; }
-
-//         resultsArr.push(
-//             {
-//                 date: val.date, 
-//                 shotrTime: val.shotrTime,
-//                 profitDaily: val.profits[ci],
-//                 profitMax: val.maxProfits[ci],
-//                 loseMax: val.maxLoses[ci],
-//                 profit: profit, 
-//                 direction: val.directions[ci],
-//                 signal: val.signals[ci], 
-//                 close: closeFlag,
-//                 midClose: midCloseFlag
-//             })
-        
-//     });  
-
-//     return resultsArr
-// }
-
 module.exports = {
     readFile,
     takeProfits
 }
-
-
-
-
-    //     switch (conf.read.switch) {
-    //         case 1:
-    //             var output = rawOutput(data.map(val => val.days)[0], currency)
-    //         break
-    //         case 2:
-    //             formatMultipleFileTable(data.map(val => val.sums), currencies)
-    //         break
-    //         case 3: 
-    //             com.saveJson(transfearDaysArr(data.map(val => val.days), currencies))
-    //             var output = "OK"
-    //         break
-    //     }
-
-    //     return output
-    // }

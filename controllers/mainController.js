@@ -68,9 +68,9 @@ app.get("/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take", async functio
   var step     = req.params.step;
   var yearFrom = req.params.yearfrom;
   var yearTo   = req.params.yearto;
-  var spread   = req.params.spread;
-  var tp       = req.params.tp;
-  var sl       = req.params.sl;
+  var spread   = Number(req.params.spread);
+  var tp       = Number(req.params.tp);
+  var sl       = Number(req.params.sl);
 
   var data = await getData(currency, step, yearFrom, yearTo)
 
@@ -79,7 +79,7 @@ app.get("/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take", async functio
 
   var dataWithProfits = dataController.takeProfits(data, spread, tp, sl)
   var output = outputController.outputWithProfits(dataWithProfits)
-  
+
   res.render("index", { output });
 });
 

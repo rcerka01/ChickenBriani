@@ -77,7 +77,7 @@ function outputWithProfits(data) {
         if (i % 2 == 0) trColor = "#eee"; else trColor = "#fff";
 
         if (element.isOpen) isOpenColor = "#000"
-        else isOpenColor = "grey"; 
+        else isOpenColor = "#fff"; 
 
         if (element.directionFlag == "red") redgreen = "#FFCCCB" 
         else if (element.directionFlag == "green") redgreen = "#90EE90";
@@ -120,6 +120,7 @@ function outputWithProfits(data) {
 
         "<td>" + takenProfitInPips.toFixed()  + "</td>" +
         "<td " + takenProfitStyle + ">" + takenProfitInGBP.toFixed(2)  + "</td>" +
+        "<td>" + element.isOpen + "</td>" +
         "</tr>"
     })
     output = output + "</table>"
