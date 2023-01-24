@@ -63,6 +63,7 @@ function outputWithProfits(data) {
     var isOpenColor = "#000"
     var trColor = "#fff"
     var redgreen = "#fff"
+    var takenProfitStyle = ""
 
     var output = "<table><tr><th colspan=4></th>" +
     "<th>Close</th><th>Direction</th>" +
@@ -97,6 +98,9 @@ function outputWithProfits(data) {
         var dailyMinProfitInPips = com.convertToPips(element.minProfit, currency)
         var dailyMinProfitInGBP = dailyMinProfitInPips * onePip
 
+        // taken in bold
+        if (Number(takenProfitInPips) != 0) takenProfitStyle = "style='font-weight:bold;'"; else takenProfitStyle = ""
+
         output = output + "<tr bgcolor=" + trColor + ">" +
         "<td>" + i + "</td>" +
         "<td>" + element.date + "</td>" +
@@ -115,7 +119,7 @@ function outputWithProfits(data) {
         "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMinProfitInGBP.toFixed(2) + "</td>" +
 
         "<td>" + takenProfitInPips.toFixed()  + "</td>" +
-        "<td>" + takenProfitInGBP.toFixed(2)  + "</td>" +
+        "<td " + takenProfitStyle + ">" + takenProfitInGBP.toFixed(2)  + "</td>" +
         "</tr>"
     })
     output = output + "</table>"

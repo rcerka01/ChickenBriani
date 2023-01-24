@@ -129,23 +129,36 @@ function takeProfits(data, sp, tp, sl) {
     var resultsArr = []
     var isOpen = true
 
-    days.forEach( val => 
+    days.forEach( (val, i) => {
+        takenProfit = 0
 
-        resultsArr.push(
-            {
-                date: val.date, 
-                time: val.time,
-                weekday: val.weekday,
-                currentClose: fix5(val.currentClose),
-                direction: val.direction,
-                directionFlag: val.directionFlag,
-                dailyProfit: dailyProfit,
-                takenProfit: takenProfit,
-                maxProfit: maxProfit,
-                minProfit: minProfit,
-                isOpen: isOpen
-            })
-    )
+        if (isOpen) dailyProfit = val.profit; else dailyProfit = 0
+        if (isOpen) maxProfit = val.maxProf; else maxProfit = 0
+        if (isOpen) minProfit = val.minProf; else minProfit = 0
+
+        // take profit on dirction change
+        if (isOpen) {
+            if (days.length > i + 1 && days[i + 1].directionFlag != val.directionFlag) {
+                takenProfit = val.profit
+            }
+        }
+
+        resultsArr.push({
+            date: val.date, 
+            time: val.time,
+            weekday: val.weekday,
+            currentClose: fix5(val.currentClose),
+            direction: val.direction,
+            directionFlag: val.directionFlag,
+            dailyProfit: dailyProfit,
+            takenProfit: takenProfit,
+            maxProfit: maxProfit,
+            minProfit: minProfit,
+            isOpen: isOpen
+        })
+    
+    })
+
     return { arr: resultsArr, currencyData: currency }
 }
 
