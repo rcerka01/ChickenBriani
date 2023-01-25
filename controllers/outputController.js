@@ -1,6 +1,14 @@
 const com = require("./commonsController");
 
 /*
+ * Inner. Used in rawOutput and outputProfitsByYear
+ */
+function createTitle(currency) {
+    return currency.name + "<br> margin: " + com.getMarginGbp(currency).toFixed(2) + 
+        " pip: "    + currency.pip + " or " + com.getOnePipValueGbp(currency).toFixed(2) + " gbp"
+}
+
+/*
  * Direct output with direction turnings and test
  */
 function rawOutput(data) {
@@ -14,7 +22,7 @@ function rawOutput(data) {
     var redgreen = "#fff"
     var counter = 1
 
-    var output = "<table><tr style='color: brown;'><th colspan=7>" + com.createTitle(currency) + "</th>" +
+    var output = "<table><tr style='color: brown;'><th colspan=7>" + createTitle(currency) + "</th>" +
         "<th colspan=2>Profit</th><th colspan=2>Max profit</th><th colspan=2>Max loss</th></tr>" +
         "<th>Nr</th><th>Time</th><th>Date</th><th>Day</th><th>Close</th><th>Direction</th><th>Test</th>" +
         "<th>Pips</th><th>GBP</th><th>Pips</th><th>GBP</th><th>Pips</th><th>GBP</th></tr>"
@@ -128,9 +136,92 @@ function outputWithProfits(data) {
     return output
 }
 
+/*
+ *
+ */
+function outputProfitsByYear(arr, tp, sl, currency) {
+    if (tp != undefined) var outputTp = "TP: " + tp + "<br>"; else var outputTp = ""
+    if (sl != undefined) var outputSl = "SL: " + sl; else var outputSl = ""
+
+    var onePipvalue = com.getOnePipValueGbp(currency)
+
+    var output = createTitle(currency) + "<br>"
+    
+    output = output + "<table style='border: 1px solid black;'>"
+
+    output = output + "<tr>"
+    arr.forEach( val => {
+        output = output + "<th>" + val.year + "<br>" + outputTp + " " + outputSl + "</th>"
+    })
+    output = output + "</tr>"
+
+    output = output + "<tr>"
+
+    var inlineMonthlyProfits = []
+
+    arr.forEach( (val, i) => {
+
+        var pips0 = com.convertToPips(val.profits[0], currency)
+        var pips1 = com.convertToPips(val.profits[1], currency)
+        var pips2 = com.convertToPips(val.profits[2], currency)
+        var pips3 = com.convertToPips(val.profits[3], currency)
+        var pips4 = com.convertToPips(val.profits[4], currency)
+        var pips5 = com.convertToPips(val.profits[5], currency)
+        var pips6 = com.convertToPips(val.profits[6], currency)
+        var pips7 = com.convertToPips(val.profits[7], currency)
+        var pips8 = com.convertToPips(val.profits[8], currency)
+        var pips9 = com.convertToPips(val.profits[9], currency)
+        var pips10 = com.convertToPips(val.profits[10], currency)
+        var pips11 = com.convertToPips(val.profits[11], currency)
+
+        inlineMonthlyProfits.push((pips0 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips1 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips2 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips3 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips4 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips5 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips6 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips7 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips8 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips9 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips10 * onePipvalue).toFixed(2))
+        inlineMonthlyProfits.push((pips11 * onePipvalue).toFixed(2))
+
+        output = output + "<td>" + 
+        "January: " + pips0.toFixed() + " / <strong>" + (pips0 * onePipvalue).toFixed(2) + "</strong><br>" +
+        "February: " + pips1.toFixed() + " / <strong>" + (pips1 * onePipvalue).toFixed(2) + "</strong><br>" +
+        "March: " + pips2.toFixed() + " / <strong>" + (pips2 * onePipvalue).toFixed(2)+ "</strong><br>" + 
+        "April: " + pips3.toFixed() + " / <strong>" + (pips3 * onePipvalue).toFixed(2) + "</strong><br>" + 
+        "May: " + pips4.toFixed() + " / <strong>" + (pips4 * onePipvalue).toFixed(2) + "</strong><br>" + 
+        "June: " + pips5.toFixed() + " / <strong>" + (pips5 * onePipvalue).toFixed(2) + "</strong><br>" + 
+        "July: " + pips6.toFixed() + " / <strong>" + (pips6 * onePipvalue).toFixed(2) + "</strong><br>" + 
+        "August: " + pips7.toFixed() + " / <strong>" + (pips7 * onePipvalue).toFixed(2) + "</strong><br>" + 
+        "September: " + pips8.toFixed() + " / <strong>" + (pips8 * onePipvalue).toFixed(2) + "</strong><br>" +
+        "October: " + pips9.toFixed() + " / <strong>" + (pips9 * onePipvalue).toFixed(2) + "</strong><br>" +
+        "November: " + pips10.toFixed() + " / <strong>" + (pips10 * onePipvalue).toFixed(2) + "</strong><br>" +
+        "December: " + pips11.toFixed() + " / <strong>" + (pips11 * onePipvalue).toFixed(2) + "</strong><br>" +
+      "</td>"
+    })
+
+    output = output + "</tr><tr>"
+
+    arr.forEach( (val, i) => {
+        output = output + "<th>" + (com.convertToPips(val.sum, currency) * onePipvalue).toFixed(2) + "</th>"
+    })
+
+    output = output + "</tr>"
+    output = output + "</table>"
+    output = output + "<br><strong>Monthly profits: </strong><br>"
+    output = output + inlineMonthlyProfits.sort((a, b) => b - a)
+    output = output + "<br>"
+
+    return output
+}
+
 module.exports = {
     rawOutput,
-    outputWithProfits
+    outputWithProfits,
+    outputProfitsByYear
 }
 
 

@@ -169,7 +169,7 @@ function takeProfits(data, sp, tp, sl) {
         
         // if tp defind
         else if (tp != 0 && isOpen) {
-            if (val.profit - sp - secondaryOpenSubtractor >= tp) {
+            if (val.maxProf - sp - secondaryOpenSubtractor >= tp) {
                 takenProfit = tp - sp
                 closeNext = true
             }
@@ -177,7 +177,7 @@ function takeProfits(data, sp, tp, sl) {
 
         // if sl defind
         else if (sl != 0 && isOpen) {
-            if (val.profit - sp - secondaryOpenSubtractor <= sl) {
+            if (val.minProf - sp - secondaryOpenSubtractor <= sl) {
                 takenProfit = sl - sp
                 closeNext = true
             }
@@ -207,7 +207,28 @@ function takeProfits(data, sp, tp, sl) {
     return { arr: resultsArr, currencyData: currency }
 }
 
+/*
+ * Public
+ */
+function profitsByYear(arr) {
+    var result = []
+
+    for (var i=2022; i<=2023; i++) {
+        var yearlyArr = []
+        var byYear = arr.filter(val => com.dateToYear(val.date) == i)
+        for (var ii=1; ii<=12; ii++) {
+            var byMonth = byYear.filter(val => com.dateToMonth(val.date) == ii)
+            yearlyArr.push(com.arrSum(byMonth.map(val => val.takenProfit)))
+        }
+        result.push({ year: i, profits: yearlyArr, sum: com.arrSum(yearlyArr.filter(val => val != undefined))})
+    }
+
+    return result
+}
+
+
 module.exports = {
     readFile,
-    takeProfits
+    takeProfits,
+    profitsByYear
 }

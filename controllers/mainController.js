@@ -72,15 +72,17 @@ app.get("/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take", async functio
   var tp       = Number(req.params.tp);
   var sl       = Number(req.params.sl);
 
+  var currencyData = conf.mapper.find(c => c.name == currency)
+
   var data = await getData(currency, step, yearFrom, yearTo)
 
-  console.log(data.currencyData)
-  console.log(data.days[5])
-
   var dataWithProfits = dataController.takeProfits(data, spread, tp, sl)
-  var output = outputController.outputWithProfits(dataWithProfits)
+  var byYear = dataController.profitsByYear(dataWithProfits.arr)
 
-  res.render("index", { output });
+  var output = outputController.outputProfitsByYear(byYear, tp, sl, currencyData)
+               + outputController.outputWithProfits(dataWithProfits)
+  
+  res.render("index", { output }); 
 });
 
 
