@@ -121,7 +121,7 @@ module.exports = {
             value: 0.1,
             marginToGBP: 1,
             pipToGBP: toGBP.CHF,
-            enabled: true
+            enabled: false
         },
         { //10
             id: 48,

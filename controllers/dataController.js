@@ -252,7 +252,6 @@ function countAvaregesAndPositives(data, tp, sl) {
     return { tp, sl, monthlyProfits, positives, total, sums, arrCountMinProfit: data.arr }
 }
 
-
 module.exports = {
     readFile,
     takeProfits,
