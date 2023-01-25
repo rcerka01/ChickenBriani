@@ -73,18 +73,11 @@ function outputWithProfits(data) {
     var redgreen = "#fff"
     var takenProfitStyle = ""
 
-    var lowest = com.toGbp(Math.min.apply(Math, arr.map(val => Number(val.minProfit))), currency).toFixed(2)
-
-    var output = "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>"
-    
-    output = output + "<table><tr><th colspan=4></th>" +
+    var output = "<table><tr><th colspan=4></th>" +
     "<th>Close</th><th>Direction</th>" +
     "<th>Daily<br> PIPs</th><th>Max<br> PIPs</th><th>Min<br> PIPs</th>" +
     "<th>Daily<br> GBP</th><th>Max<br> GBP</th><th>Min<br>  GBP</th>" +
     "<th>Taken<br> PIPs</th><th>Taken<br> GBP</th></tr>"
-
-    console.log()
-
 
     arr.forEach( (element, i) => {
 
@@ -154,12 +147,12 @@ function outputProfitsByYear(arr, tp, sl, currency) {
     
     var output = "<table style='border: 1px solid black;'>"
     output = output + "<tr>"
-    arr.forEach( val => {
+    arr.result.forEach( val => {
         output = output + "<th>" + val.year + "<br>" + outputTp + " " + outputSl + "</th>"
     })
     output = output + "</tr><tr>"
 
-    arr.forEach( (val, i) => {
+    arr.result.forEach( (val) => {
 
         var pips0 = com.convertToPips(val.profits[0], currency)
         var pips1 = com.convertToPips(val.profits[1], currency)
@@ -192,7 +185,7 @@ function outputProfitsByYear(arr, tp, sl, currency) {
 
     output = output + "</tr><tr>"
 
-    arr.forEach( (val, i) => {
+    arr.result.forEach( val => {
         output = output + "<th>" + (com.convertToPips(val.sum, currency) * onePipvalue).toFixed(2) + "</th>"
     })
 
@@ -206,30 +199,29 @@ function outputProfitsByYear(arr, tp, sl, currency) {
 /*
  *
  */
-function outputAvaragesAndPositives(arr, currency) {
+function outputAvaragesAndPositives(val, currency) {
     var onePipvalue = com.getOnePipValueGbp(currency)
 
     var output = "<h4 style='color:brown;'>" + createTitle(currency) + "</h4>"
-
     output = output + "<table>"
 
-    arr.forEach( (val) => {
+    var positivesPercent = (val.positives / val.total * 100).toFixed() 
+    var total = (com.convertToPips(com.arrSum(val.sums), currency) * onePipvalue).toFixed(2)     
+    var row = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
+    var lowest = com.toGbp(Math.min.apply(Math, val.arrCountMinProfit.map(val => Number(val.minProfit))), currency).toFixed(2)
+    var output = "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>"
 
-        var positivesPercent = (val.positives / val.total * 100).toFixed() 
-        var total = (com.convertToPips(com.arrSum(val.sums), currency) * onePipvalue).toFixed(2)     
-        var row = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
-    
-        output = output + 
-            "<table>" +
-                "<tr><td><strong>TP:</strong></td><td>" + val.tp + "</td>" +
-                    "<td><strong>Sl:</strong></td><td>" + val.sl + "</td></tr>" +
-                "<tr><td><strong>Total:</strong></td><td>" + val.total + "</td>" +
-                    "<td><strong>Positives:</strong></td><td>" + val.positives + " (" + positivesPercent + "%)</td></tr>" +
-            "</table>" +
-           
-            "<strong>Total for the priod :</strong><span style='color:red;'>" + total + "</span><br>" +
-            "<br><strong>Monthly profits descending: </strong><br>" + row + "<br><br>"
-    })
+    output = output + 
+        "<table>" +
+            "<tr><td><strong>TP:</strong></td><td>" + val.tp + "</td>" +
+                "<td><strong>Sl:</strong></td><td>" + val.sl + "</td></tr>" +
+            "<tr><td><strong>Total:</strong></td><td>" + val.total + "</td>" +
+                "<td><strong>Positives:</strong></td><td>" + val.positives + " (" + positivesPercent + "%)</td></tr>" +
+        "</table>" +
+        
+        "<strong>Total for the priod: </strong><span style='color:red;'>" + total + "</span><br>" +
+        "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>" +
+        "<strong>Monthly profits descending: </strong><br>" + row + "<br><br>"
 
     return output
 }

@@ -165,22 +165,23 @@ function takeProfits(data, sp, tp, sl) {
                 openNext = true
                 secondaryOpenSubtractor = 0
             }
-        }
-        
-        // if tp defind
-        else if (tp != 0 && isOpen) {
-            if (val.maxProf - sp - secondaryOpenSubtractor >= tp) {
-                takenProfit = tp - sp
-                closeNext = true
+        } else {
+            // if tp defind
+            if (tp != 0 && isOpen) {
+                if (val.maxProf - sp - secondaryOpenSubtractor >= tp) {
+                    takenProfit = tp - sp
+                    closeNext = true
+                }
             }
-        }
 
-        // if sl defind
-        else if (sl != 0 && isOpen) {
-            if (val.minProf - sp - secondaryOpenSubtractor <= sl) {
-                takenProfit = sl - sp
-                closeNext = true
+            // if sl defind
+            if (sl != 0 && isOpen) {
+                if (val.minProf - sp - secondaryOpenSubtractor <= sl) {
+                    takenProfit = sl - sp
+                    closeNext = true
+                }
             }
+           
         }
 
         // dailies
@@ -220,31 +221,22 @@ function profitsByYear(arr) {
             var byMonth = byYear.filter(val => com.dateToMonth(val.date) == ii)
             yearlyArr.push(com.arrSum(byMonth.map(val => val.takenProfit)))
         }
-        result.push({ year: i, profits: yearlyArr, sum: com.arrSum(yearlyArr.filter(val => val != undefined))})
+        result.push({ year: i, profits: yearlyArr, sum: com.arrSum(yearlyArr.filter(val => val != undefined)) })
     }
 
-    return result
+    return { result, arr }
 }
 
 /*
  * Public
  */
-function sortAvaragesAndPositives(arr) {
-    return  arr.sort((a,b) => com.arrSum(b.sums) - com.arrSum(a.sums))
-}
-
-/*
- * Public
- */
-function countAvaregesAndPositives(arr, tp, sl) {
-
+function countAvaregesAndPositives(data, tp, sl) {
     var positives = 0
     var total = 0
     var sums = []
     var monthlyProfits = []
 
-
-    arr.forEach( val => {
+    data.result.forEach( val => {
         sums.push(val.sum)
 
         monthlyProfits.push(val.profits)
@@ -257,7 +249,7 @@ function countAvaregesAndPositives(arr, tp, sl) {
 
     monthlyProfits = monthlyProfits.flatMap(val => val)
 
-    return [{ tp, sl, monthlyProfits, positives, total, sums }]
+    return { tp, sl, monthlyProfits, positives, total, sums, arrCountMinProfit: data.arr }
 }
 
 
@@ -265,6 +257,5 @@ module.exports = {
     readFile,
     takeProfits,
     profitsByYear,
-    sortAvaragesAndPositives,
     countAvaregesAndPositives,
 }
