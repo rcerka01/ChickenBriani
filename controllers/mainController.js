@@ -1,6 +1,7 @@
 const conf             = require("../config/config");
 const dataController   = require("./dataController")
 const outputController   = require("./outputController")
+const com = require("./commonsController");
 
 async function getData(currency, step, yearFrom, yearTo) { 
   var path = conf.fileName.path + conf.fileName.prefix + currency + conf.fileName.join + step + ".csv"
@@ -19,6 +20,9 @@ module.exports = { run: function (app) {
 
       "http://localhost:3000/GBPCHF/1D/2023/2023/0/10000/-10000/take" +
       "/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take" +
+
+      "http://localhost:3000/GBPCHF/1D/2022/2023/2/10/200/10/-500/-10/10/multiple" +
+      "/:currency/:step/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple" +
       "</p>"
     res.render("index", { output });
   });
@@ -34,7 +38,6 @@ module.exports = { run: function (app) {
       res.render("index", { output });
   });
 
-
   app.get("/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take", async function(req, res) {
     var currency = req.params.currency;
     var step     = req.params.step;
@@ -45,7 +48,6 @@ module.exports = { run: function (app) {
     var sl       = Number(req.params.sl);
 
     var currencyData = conf.mapper.find(c => c.name == currency)
-
     var data = await getData(currency, step, yearFrom, yearTo)
 
     var dataWithProfits = dataController.takeProfits(data, spread, tp, sl)
@@ -56,6 +58,42 @@ module.exports = { run: function (app) {
         + outputController.outputProfitsByYear(byYear, tp, sl, currencyData)
         + outputController.outputWithProfits(dataWithProfits)
     
+    res.render("index", { output }); 
+  });
+
+  app.get("/:currency/:step/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple", async function(req, res) {
+    var currency = req.params.currency;
+    var step     = req.params.step;
+    var yearFrom = req.params.yearfrom;
+    var yearTo   = req.params.yearto;
+    var spread   = Number(req.params.spread);
+    var tpfrom   = Number(req.params.tpfrom);
+    var tptill   = Number(req.params.tptill);
+    var tpstep   = Number(req.params.tpstep);
+    var slfrom   = Number(req.params.slfrom);
+    var sltill   = Number(req.params.sltill);
+    var slstep   = Number(req.params.slstep);
+
+    var currencyData = conf.mapper.find(c => c.name == currency)
+    var data = await getData(currency, step, yearFrom, yearTo)
+
+    var outputs = []
+    var output  = ""
+
+    for (var i=tpfrom; i<=tptill; i=i+tpstep) {
+      for (var ii=slfrom; ii<=sltill; ii=ii+slstep) {
+
+        var dataWithProfits = dataController.takeProfits(data, spread, i, ii)
+        var byYear = dataController.profitsByYear(dataWithProfits.arr)
+
+        outputs.push(dataController.countAvaregesAndPositives(byYear, i, ii))
+      }
+    }
+
+    outputs.sort((a,b) => com.arrSum(b.sums) - com.arrSum(a.sums))
+
+    outputs.forEach( item => output = output + outputController.outputAvaragesAndPositives(item, currencyData))
+
     res.render("index", { output }); 
   });
 
