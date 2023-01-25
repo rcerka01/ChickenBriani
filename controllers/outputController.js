@@ -73,11 +73,18 @@ function outputWithProfits(data) {
     var redgreen = "#fff"
     var takenProfitStyle = ""
 
-    var output = "<table><tr><th colspan=4></th>" +
+    var lowest = com.toGbp(Math.min.apply(Math, arr.map(val => Number(val.minProfit))), currency).toFixed(2)
+
+    var output = "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>"
+    
+    output = output + "<table><tr><th colspan=4></th>" +
     "<th>Close</th><th>Direction</th>" +
     "<th>Daily<br> PIPs</th><th>Max<br> PIPs</th><th>Min<br> PIPs</th>" +
-    "<th>Daily<br> GBP</th><th>Max<br>  GBP</th><th>Min<br>  GBP</th>" +
-    "<th>Taken<br>  PIPs</th><th>Taken<br> GBP</th></tr>"
+    "<th>Daily<br> GBP</th><th>Max<br> GBP</th><th>Min<br>  GBP</th>" +
+    "<th>Taken<br> PIPs</th><th>Taken<br> GBP</th></tr>"
+
+    console.log()
+
 
     arr.forEach( (element, i) => {
 
@@ -144,20 +151,13 @@ function outputProfitsByYear(arr, tp, sl, currency) {
     if (sl != undefined) var outputSl = "SL: " + sl; else var outputSl = ""
 
     var onePipvalue = com.getOnePipValueGbp(currency)
-
-    var output = createTitle(currency) + "<br>"
     
-    output = output + "<table style='border: 1px solid black;'>"
-
+    var output = "<table style='border: 1px solid black;'>"
     output = output + "<tr>"
     arr.forEach( val => {
         output = output + "<th>" + val.year + "<br>" + outputTp + " " + outputSl + "</th>"
     })
-    output = output + "</tr>"
-
-    output = output + "<tr>"
-
-    var inlineMonthlyProfits = []
+    output = output + "</tr><tr>"
 
     arr.forEach( (val, i) => {
 
@@ -173,19 +173,6 @@ function outputProfitsByYear(arr, tp, sl, currency) {
         var pips9 = com.convertToPips(val.profits[9], currency)
         var pips10 = com.convertToPips(val.profits[10], currency)
         var pips11 = com.convertToPips(val.profits[11], currency)
-
-        inlineMonthlyProfits.push((pips0 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips1 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips2 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips3 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips4 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips5 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips6 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips7 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips8 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips9 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips10 * onePipvalue).toFixed(2))
-        inlineMonthlyProfits.push((pips11 * onePipvalue).toFixed(2))
 
         output = output + "<td>" + 
         "January: " + pips0.toFixed() + " / <strong>" + (pips0 * onePipvalue).toFixed(2) + "</strong><br>" +
@@ -211,17 +198,48 @@ function outputProfitsByYear(arr, tp, sl, currency) {
 
     output = output + "</tr>"
     output = output + "</table>"
-    output = output + "<br><strong>Monthly profits: </strong><br>"
-    output = output + inlineMonthlyProfits.sort((a, b) => b - a)
     output = output + "<br>"
 
     return output
 }
 
+/*
+ *
+ */
+function outputAvaragesAndPositives(arr, currency) {
+    var onePipvalue = com.getOnePipValueGbp(currency)
+
+    var output = "<h4 style='color:brown;'>" + createTitle(currency) + "</h4>"
+
+    output = output + "<table>"
+
+    arr.forEach( (val) => {
+
+        var positivesPercent = (val.positives / val.total * 100).toFixed() 
+        var total = (com.convertToPips(com.arrSum(val.sums), currency) * onePipvalue).toFixed(2)     
+        var row = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
+    
+        output = output + 
+            "<table>" +
+                "<tr><td><strong>TP:</strong></td><td>" + val.tp + "</td>" +
+                    "<td><strong>Sl:</strong></td><td>" + val.sl + "</td></tr>" +
+                "<tr><td><strong>Total:</strong></td><td>" + val.total + "</td>" +
+                    "<td><strong>Positives:</strong></td><td>" + val.positives + " (" + positivesPercent + "%)</td></tr>" +
+            "</table>" +
+           
+            "<strong>Total for the priod :</strong><span style='color:red;'>" + total + "</span><br>" +
+            "<br><strong>Monthly profits descending: </strong><br>" + row + "<br><br>"
+    })
+
+    return output
+}
+
+
 module.exports = {
     rawOutput,
     outputWithProfits,
-    outputProfitsByYear
+    outputProfitsByYear,
+    outputAvaragesAndPositives
 }
 
 

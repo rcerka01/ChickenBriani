@@ -96,10 +96,12 @@ module.exports = { run: function (data) {
 
             var profits = com.getProfits2(jsonData, ci, tp, sl, currency)
             var profitsByYear = com.profitsByYearArr(profits)
-            avAndPos.push(com.countAvaregesAndPositives(profitsByYear, tp, sl))
 
+            avAndPos.push(com.countAvaregesAndPositives(profitsByYear, tp, sl))
             output = com.outputAvaragesAndPositives(com.sortAvaragesAndPositives(avAndPos), currency)
-                   +com.outputProfitsByYear(profitsByYear, tp, sl, currency) 
+                 
+            
+            +com.outputProfitsByYear(profitsByYear, tp, sl, currency) 
                    + outputProfits(profits, currency)
         break
 

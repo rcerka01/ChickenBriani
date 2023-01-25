@@ -52,6 +52,10 @@ function convertToPips(val, currency) {
     return val / currency.pip
 }
 
+function toGbp(val, currency) {
+    return convertToPips(val, currency) * getOnePipValueGbp(currency)
+}
+
 
 
 
@@ -71,9 +75,6 @@ function convertToPips(val, currency) {
 
 
 
-function getOnePipValueGbp(currency) {
-    return currency.lot * currency.value * currency.pip * currency.pipToGBP
-}
 
 
 
@@ -276,28 +277,28 @@ function timeGapMapper(timeGap) {
 // }
 
 // single and combined
-function countAvaregesAndPositives(arr, tp, sl) {
-    var positives = 0
-    var total = 0
-    var sums = []
-    var monthlyProfits = []
+// function countAvaregesAndPositives(arr, tp, sl) {
+//     var positives = 0
+//     var total = 0
+//     var sums = []
+//     var monthlyProfits = []
 
 
-    arr.forEach( val => {
-        sums.push(val.sum)
+//     arr.forEach( val => {
+//         sums.push(val.sum)
 
-        monthlyProfits.push(val.profits)
+//         monthlyProfits.push(val.profits)
 
-        val.profits.forEach( prof => {
-            total = total + 1
-            if (prof > 0) positives = positives + 1
-        })
-    })
+//         val.profits.forEach( prof => {
+//             total = total + 1
+//             if (prof > 0) positives = positives + 1
+//         })
+//     })
 
-    monthlyProfits = monthlyProfits.flatMap(val => val)
+//     monthlyProfits = monthlyProfits.flatMap(val => val)
 
-    return { tp, sl, monthlyProfits, positives, total, sums }
-}
+//     return { tp, sl, monthlyProfits, positives, total, sums }
+// }
 
 // single
 // function outputProfitsByYear(arr, tp, sl, currency) {
@@ -379,49 +380,49 @@ function countAvaregesAndPositives(arr, tp, sl) {
 // }
 
 // single and combined
-function sortAvaragesAndPositives(arr) {
-    return  arr.sort((a,b) => arrSum(b.sums) - arrSum(a.sums))
-}
+// function sortAvaragesAndPositives(arr) {
+//     return  arr.sort((a,b) => arrSum(b.sums) - arrSum(a.sums))
+// }
 
 // single
-function outputAvaragesAndPositives(arr, currency) {
-    var output = "<table>"
-    var onePipvalue = getOnePipValueGbp(currency)
+// function outputAvaragesAndPositives(arr, currency) {
+//     var output = "<table>"
+//     var onePipvalue = getOnePipValueGbp(currency)
 
-    var positives = arr.map(val => val.positives)
-    var maxPositives = Math.max.apply(Math, positives)
+//     var positives = arr.map(val => val.positives)
+//     var maxPositives = Math.max.apply(Math, positives)
     
-    arr.forEach( (val) => {
+//     arr.forEach( (val) => {
 
-        output = output + 
-            "<tr>" + 
-                "<td>TP: " + val.tp + "</td>" +
-                "<td>SL: " + val.sl + "</td>" +
-                "<td>" + val.positives + "/" + val.total + "</td>" +
-                "<td><strong>" + val.sums.map(val => " " + (convertToPips(val, currency) * onePipvalue).toFixed(2)) + "</strong></td>" +
-            "</tr>" + 
-            "<tr>" + 
-                "<td>max: " + maxPositives + " / </td>" +
-                "<td>" + (val.positives / val.total * 100).toFixed() + "%</td>" +
-                "<td style='color:red;'>" + (convertToPips(arrSum(val.sums), currency) * onePipvalue).toFixed(2)  + "</td>" +
-                "<td>" + val.sums.sort((a,b) => Number(a) - Number(b)).map(val => " " + (convertToPips(val, currency) * onePipvalue).toFixed(2))  + "</td>" +
-            "</tr>" +
-            "<tr>" + 
-                "<td></td>" +
-                "<td></td>" +
-                "<td></td>" +
-                "<td>" + val.monthlyProfits.map(val => (convertToPips(val, currency) * onePipvalue).toFixed(2))  + "</td>" +
-            "</tr>" +
-                "<tr>" + 
-                "<td></td>" +
-                "<td></td>" +
-                "<td></td>" +
-                "<td>" + val.monthlyProfits.sort((a,b) => a - b).map(val => (convertToPips(val, currency) * onePipvalue).toFixed(2))  + "</td>" +
-            "</tr>" 
-    })
-    output = output + "</table>"
-    return output
-}
+//         output = output + 
+//             "<tr>" + 
+//                 "<td>TP: " + val.tp + "</td>" +
+//                 "<td>SL: " + val.sl + "</td>" +
+//                 "<td>" + val.positives + "/" + val.total + "</td>" +
+//                 "<td><strong>" + val.sums.map(val => " " + (convertToPips(val, currency) * onePipvalue).toFixed(2)) + "</strong></td>" +
+//             "</tr>" + 
+//             "<tr>" + 
+//                 "<td>max: " + maxPositives + " / </td>" +
+//                 "<td>" + (val.positives / val.total * 100).toFixed() + "%</td>" +
+//                 "<td style='color:red;'>" + (convertToPips(arrSum(val.sums), currency) * onePipvalue).toFixed(2)  + "</td>" +
+//                 "<td>" + val.sums.sort((a,b) => Number(a) - Number(b)).map(val => " " + (convertToPips(val, currency) * onePipvalue).toFixed(2))  + "</td>" +
+//             "</tr>" +
+//             "<tr>" + 
+//                 "<td></td>" +
+//                 "<td></td>" +
+//                 "<td></td>" +
+//                 "<td>" + val.monthlyProfits.map(val => (convertToPips(val, currency) * onePipvalue).toFixed(2))  + "</td>" +
+//             "</tr>" +
+//                 "<tr>" + 
+//                 "<td></td>" +
+//                 "<td></td>" +
+//                 "<td></td>" +
+//                 "<td>" + val.monthlyProfits.sort((a,b) => a - b).map(val => (convertToPips(val, currency) * onePipvalue).toFixed(2))  + "</td>" +
+//             "</tr>" 
+//     })
+//     output = output + "</table>"
+//     return output
+// }
 
 module.exports = {
     getWeekdayFromUnixTimestamp,
@@ -447,12 +448,13 @@ module.exports = {
     getEnabledCurrencies,
     findCurrencyIndexById,
     timeGapMapper,
+    toGbp
 
     // common
    // getData,
     // getProfits,
     // getProfits2,
-    countAvaregesAndPositives,
-    sortAvaragesAndPositives,
-    outputAvaragesAndPositives
+    // countAvaregesAndPositives,
+    // sortAvaragesAndPositives,
+    // outputAvaragesAndPositives
 }

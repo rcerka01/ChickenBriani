@@ -79,8 +79,12 @@ app.get("/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take", async functio
   var dataWithProfits = dataController.takeProfits(data, spread, tp, sl)
   var byYear = dataController.profitsByYear(dataWithProfits.arr)
 
-  var output = outputController.outputProfitsByYear(byYear, tp, sl, currencyData)
-               + outputController.outputWithProfits(dataWithProfits)
+  var output = outputController.outputAvaragesAndPositives(
+    dataController.sortAvaragesAndPositives(
+      dataController.countAvaregesAndPositives(byYear, tp, sl)
+      ), currencyData)
+      + outputController.outputProfitsByYear(byYear, tp, sl, currencyData)
+      + outputController.outputWithProfits(dataWithProfits)
   
   res.render("index", { output }); 
 });

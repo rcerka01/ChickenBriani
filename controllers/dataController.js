@@ -226,9 +226,45 @@ function profitsByYear(arr) {
     return result
 }
 
+/*
+ * Public
+ */
+function sortAvaragesAndPositives(arr) {
+    return  arr.sort((a,b) => com.arrSum(b.sums) - com.arrSum(a.sums))
+}
+
+/*
+ * Public
+ */
+function countAvaregesAndPositives(arr, tp, sl) {
+
+    var positives = 0
+    var total = 0
+    var sums = []
+    var monthlyProfits = []
+
+
+    arr.forEach( val => {
+        sums.push(val.sum)
+
+        monthlyProfits.push(val.profits)
+
+        val.profits.forEach( prof => {
+            total = total + 1
+            if (prof > 0) positives = positives + 1
+        })
+    })
+
+    monthlyProfits = monthlyProfits.flatMap(val => val)
+
+    return [{ tp, sl, monthlyProfits, positives, total, sums }]
+}
+
 
 module.exports = {
     readFile,
     takeProfits,
-    profitsByYear
+    profitsByYear,
+    sortAvaragesAndPositives,
+    countAvaregesAndPositives,
 }
