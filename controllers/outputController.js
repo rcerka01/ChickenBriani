@@ -111,8 +111,8 @@ function outputWithProfits(data) {
 
         output = output + "<tr bgcolor=" + trColor + ">" +
         "<td>" + i + "</td>" +
-        "<td>" + element.date + "</td>" +
         "<td>" + element.time + "</td>" +
+        "<td>" + element.date + "</td>" +
         "<td><strong>" + element.weekday + "</strong></td>" +
 
         "<td><span>" + Number(element.currentClose).toFixed(5) + "</span></td>" +
@@ -128,6 +128,7 @@ function outputWithProfits(data) {
 
         "<td>" + takenProfitInPips.toFixed()  + "</td>" +
         "<td " + takenProfitStyle + ">" + takenProfitInGBP.toFixed(2)  + "</td>" +
+        "<td>" + element.isOpen  + "</td>" +
         "</tr>"
     })
 
@@ -205,12 +206,13 @@ function outputAvaragesAndPositives(val, currency) {
     var output = "<h4 style='color:brown;'>" + createTitle(currency) + "</h4>"
     output = output + "<table>"
 
-    var positivesPercent = (val.positives / val.total * 100).toFixed() 
-    var total = (com.convertToPips(com.arrSum(val.sums), currency) * onePipvalue).toFixed(2)     
-    var row = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
     var lowest = com.toGbp(Math.min.apply(Math, val.arrCountMinProfit.map(val => Number(val.minProfit))), currency).toFixed(2)
+    var positivesPercent = (val.positives / val.total * 100).toFixed() 
+    var total = (com.convertToPips(com.arrSum(val.sums), currency) * onePipvalue).toFixed(2)  
+    var yearlyRow = val.sums.sort((a,b) => Number(b) - Number(a)).map(val => " " + (com.convertToPips(val, currency) * onePipvalue).toFixed(2))   
+    var monthlyRow = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
+    
     var output = "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>"
-
     output = output + 
         "<table>" +
             "<tr><td><strong>TP:</strong></td><td>" + val.tp + "</td>" +
@@ -221,7 +223,8 @@ function outputAvaragesAndPositives(val, currency) {
         
         "<strong>Total for the priod: </strong><span style='color:red;'>" + total + "</span><br>" +
         "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>" +
-        "<strong>Monthly profits descending: </strong><br>" + row + "<br><br>"
+        "<strong>Yearly profits: </strong><br>" + yearlyRow + "<br>" +
+        "<strong>Monthly profits, descending: </strong><br>" + monthlyRow + "<br><br>"
 
     return output
 }

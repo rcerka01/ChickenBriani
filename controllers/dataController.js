@@ -138,7 +138,6 @@ function takeProfits(data, sp, tp, sl) {
 
     days.forEach( (val, i) => {
 
-        // todo ugly
         if (closeNext) isOpen = false
         if (openNext) isOpen = true
         closeNext = false
@@ -151,10 +150,26 @@ function takeProfits(data, sp, tp, sl) {
         }
         takenProfit = 0 - secondaryOpenSubtractor
 
+        // if sl defind
+        if (sl != 0 && isOpen) {
+            if (val.minProf - sp - secondaryOpenSubtractor <= sl) {
+                takenProfit = sl - sp
+                closeNext = true
+            }
+        }
+
+        // if tp defind
+        if (tp != 0 && isOpen) {
+            if (val.maxProf - sp - secondaryOpenSubtractor >= tp) {
+                takenProfit = tp - sp
+                closeNext = true
+            }
+        }
+
         // take profit on dirction change
         if (i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
-            if (isOpen) {
-                if (val.profit - sp - secondaryOpenSubtractor < tp) { 
+            if ( ! closeNext) {
+                    if (val.profit - sp - secondaryOpenSubtractor < tp) { 
                     takenProfit = val.profit - sp - secondaryOpenSubtractor
                     secondaryOpenSubtractor = 0
                 } else {
@@ -165,28 +180,11 @@ function takeProfits(data, sp, tp, sl) {
                 openNext = true
                 secondaryOpenSubtractor = 0
             }
-        } else {
-            // if tp defind
-            if (tp != 0 && isOpen) {
-                if (val.maxProf - sp - secondaryOpenSubtractor >= tp) {
-                    takenProfit = tp - sp
-                    closeNext = true
-                }
-            }
-
-            // if sl defind
-            if (sl != 0 && isOpen) {
-                if (val.minProf - sp - secondaryOpenSubtractor <= sl) {
-                    takenProfit = sl - sp
-                    closeNext = true
-                }
-            }
-           
-        }
+        } 
 
         // dailies
-        if (isOpen) maxProfit   = val.maxProf; else maxProfit = 0
-        if (isOpen) minProfit   = val.minProf; else minProfit = 0
+        if (isOpen) maxProfit = val.maxProf; else maxProfit = val.maxProf// maxProfit = 0
+        if (isOpen) minProfit = val.minProf; else minProfit = val.minProf// minProfit = 0
         dailyProfit = val.profit
 
         resultsArr.push({
@@ -242,7 +240,7 @@ function countAvaregesAndPositives(data, tp, sl) {
         monthlyProfits.push(val.profits)
 
         val.profits.forEach( prof => {
-            total = total + 1
+            if (prof != 0) total = total + 1
             if (prof > 0) positives = positives + 1
         })
     })
