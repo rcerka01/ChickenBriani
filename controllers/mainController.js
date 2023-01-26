@@ -15,14 +15,14 @@ module.exports = { run: function (app) {
   app.get("/", async function(req, res) {
     var output = 
       "<p style = 'padding:20px;'>" +
-      "http://localhost:3000/GBPCHF/1D/2023/2023/raw <br>" +
+      "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/2023/2023/raw'>http://localhost:3000/GBPCHF/1D/2023/2023/raw</a><br>" +
       "/:currency/:step/:yearfrom/:yearto/raw <br><br>" +
 
-      "http://localhost:3000/GBPCHF/1D/2023/2023/0/10000/-10000/take" +
-      "/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take" +
+      "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/2023/2023/0/10000/-10000/take'>http://localhost:3000/GBPCHF/1D/2023/2023/0/10000/-10000/take</a><br>" +
+      "/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take<br><br>" +
 
-      "http://localhost:3000/GBPCHF/1D/2022/2023/2/10/200/10/-500/-10/10/multiple" +
-      "/:currency/:step/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple" +
+      "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/2022/2023/2/10/200/10/-500/-10/10/multiple'>http://localhost:3000/GBPCHF/1D/2022/2023/2/10/200/10/-500/-10/10/multiple</a><br>" +
+      "/:currency/:step/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple<br><br>" +
       "</p>"
     res.render("index", { output });
   });
@@ -51,7 +51,7 @@ module.exports = { run: function (app) {
     var data = await getData(currency, step, yearFrom, yearTo)
 
     var dataWithProfits = dataController.takeProfits(data, spread, tp, sl)
-    var byYear = dataController.profitsByYear(dataWithProfits.arr)
+    var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)
 
     var output = outputController.outputAvaragesAndPositives(
         dataController.countAvaregesAndPositives(byYear, tp, sl), currencyData)
@@ -84,7 +84,7 @@ module.exports = { run: function (app) {
       for (var ii=slfrom; ii<=sltill; ii=ii+slstep) {
 
         var dataWithProfits = dataController.takeProfits(data, spread, i, ii)
-        var byYear = dataController.profitsByYear(dataWithProfits.arr)
+        var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)
 
         outputs.push(dataController.countAvaregesAndPositives(byYear, i, ii))
       }

@@ -211,10 +211,10 @@ function takeProfits(data, sp, tp, sl) {
 /*
  * Public
  */
-function profitsByYear(arr) {
+function profitsByYear(arr, from, to) {
     var result = []
 
-    for (var i=2022; i<=2023; i++) {
+    for (var i=from; i<=to; i++) {
         var yearlyArr = []
         var byYear = arr.filter(val => com.dateToYear(val.date) == i)
         for (var ii=1; ii<=12; ii++) {
