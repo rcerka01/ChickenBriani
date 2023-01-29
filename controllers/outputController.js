@@ -77,7 +77,8 @@ function outputWithProfits(data) {
     "<th>Close</th><th>Direction</th>" +
     "<th>Daily<br> PIPs</th><th>Max<br> PIPs</th><th>Min<br> PIPs</th>" +
     "<th>Daily<br> GBP</th><th>Max<br> GBP</th><th>Min<br>  GBP</th>" +
-    "<th>Taken<br> PIPs</th><th>Taken<br> GBP</th></tr>"
+    "<th>Taken<br> PIPs</th><th>Taken<br> GBP</th></tr>" +
+    "<th>Open</th><th>Test></th></tr>"
 
     arr.forEach( (element, i) => {
 
@@ -110,25 +111,26 @@ function outputWithProfits(data) {
         if (Number(takenProfitInPips) != 0) takenProfitStyle = "style='font-weight:bold;'"; else takenProfitStyle = ""
 
         output = output + "<tr bgcolor=" + trColor + ">" +
-        "<td>" + i + "</td>" +
-        "<td>" + element.time + "</td>" +
-        "<td>" + element.date + "</td>" +
-        "<td><strong>" + element.weekday + "</strong></td>" +
+            "<td>" + i + "</td>" +
+            "<td>" + element.time + "</td>" +
+            "<td>" + element.date + "</td>" +
+            "<td><strong>" + element.weekday + "</strong></td>" +
 
-        "<td><span>" + Number(element.currentClose).toFixed(5) + "</span></td>" +
-        "<td><span>" + element.direction + "</span></td>" +
+            "<td><span>" + Number(element.currentClose).toFixed(5) + "</span></td>" +
+            "<td><span>" + element.direction + "</span></td>" +
 
-        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyProfitInPips.toFixed() + "</td>" +
-        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMaxProfitInPips.toFixed() + "</td>" +
-        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMinProfitInPips.toFixed() + "</td>" +
-        
-        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";font-weight:bold;'>" + dailyProfitInGBP.toFixed(2) + "</td>" +
-        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMaxProfitInGBP.toFixed(2) + "</td>" +
-        "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";font-weight:bold;'>" + dailyMinProfitInGBP.toFixed(2) + "</td>" +
+            "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyProfitInPips.toFixed() + "</td>" +
+            "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMaxProfitInPips.toFixed() + "</td>" +
+            "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMinProfitInPips.toFixed() + "</td>" +
+            
+            "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";font-weight:bold;'>" + dailyProfitInGBP.toFixed(2) + "</td>" +
+            "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";'>" + dailyMaxProfitInGBP.toFixed(2) + "</td>" +
+            "<td style='color:" + isOpenColor + ";background-color:" + redgreen + ";font-weight:bold;'>" + dailyMinProfitInGBP.toFixed(2) + "</td>" +
 
-        "<td>" + takenProfitInPips.toFixed()  + "</td>" +
-        "<td " + takenProfitStyle + ">" + takenProfitInGBP.toFixed(2)  + "</td>" +
-        "<td>" + element.isOpen  + "</td>" +
+            "<td>" + takenProfitInPips.toFixed()  + "</td>" +
+            "<td " + takenProfitStyle + ">" + takenProfitInGBP.toFixed(2)  + "</td>" +
+            "<td>" + element.isOpen  + "</td>" +
+            "<td>" + element.test + "</td>" +
         "</tr>"
     })
 
@@ -209,7 +211,7 @@ function outputAvaragesAndPositives(val, currency) {
     var lowest = com.toGbp(Math.min.apply(Math, val.arrCountMinProfit.map(val => Number(val.minProfit))), currency).toFixed(2)
     var positivesPercent = (val.positives / val.total * 100).toFixed() 
     var total = (com.convertToPips(com.arrSum(val.sums), currency) * onePipvalue).toFixed(2)  
-    var yearlyRow = val.sums.sort((a,b) => Number(b) - Number(a)).map(val => " " + (com.convertToPips(val, currency) * onePipvalue).toFixed(2))   
+    var yearlyRow = val.sums.map(val => " " + (com.convertToPips(val, currency) * onePipvalue).toFixed(2))   
     var monthlyRow = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
     
     var output = "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>"

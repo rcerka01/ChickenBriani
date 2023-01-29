@@ -122,6 +122,9 @@ function takeProfits(data, sp, tp, sl) {
     var currency = data.currencyData
     var days     = data.days
 
+    // quick util function
+    function gbp(val) { return com.toGbp(val, currency).toFixed(2) }
+
     var dailyProfit = 0
     var takenProfit = 0
     var maxProfit = 0
@@ -131,17 +134,74 @@ function takeProfits(data, sp, tp, sl) {
     var isOpen = true
     var openNext = false
     var closeNext = false
+    var test = ""
 
     sp = com.gbpToChartValue(currency, sp)
     tp = com.gbpToChartValue(currency, tp)
     sl = com.gbpToChartValue(currency, sl)
 
+    // inner
+    // swap over
+    function takeProfitSlTp(first, takenProfit) {
+        var profit = takenProfit
+
+        if (first == "tp") {
+            // if sl defined
+            if (sl != 0 && isOpen) {
+                if (minProfit - sp - secondaryOpenSubtractor <= sl) {
+                    if (secondaryOpenSubtractor != 0) 
+                        test = test + " SL: " + gbp(minProfit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " <= " + gbp(sl)
+                    closeNext = true
+                    profit = sl - sp
+                }
+            }
+
+            // if tp defined
+            if (tp != 0 && isOpen) {
+                if (maxProfit - sp - secondaryOpenSubtractor >= tp) {
+                    if (secondaryOpenSubtractor != 0) 
+                        test = test + " TP: " + gbp(maxProfit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " >= " + gbp(tp)
+                    closeNext = true
+                    profit = tp - sp
+                }
+            }
+        } else {
+            // if tp defined
+            if (tp != 0 && isOpen) {
+                if (maxProfit - sp - secondaryOpenSubtractor >= tp) {
+                    if (secondaryOpenSubtractor != 0) 
+                        test = test + " Tp: " + gbp(maxProfit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " >= " + gbp(tp)
+                    closeNext = true
+                    profit = tp - sp
+                }
+            }
+
+            // if sl defined
+            if (sl != 0 && isOpen) {
+                if (minProfit - sp - secondaryOpenSubtractor <= sl) {
+                    if (secondaryOpenSubtractor != 0) 
+                        test = test + " SL: " + gbp(minProfit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " <= " + gbp(sl)
+                    closeNext = true
+                    profit = sl - sp
+                }
+            }
+        }
+
+        return profit
+    }
+
     days.forEach( (val, i) => {
+        test = ""
 
         if (closeNext) isOpen = false
         if (openNext) isOpen = true
         closeNext = false
         openNext = false
+
+        // dailies
+        maxProfit = val.maxProf
+        minProfit = val.minProf
+        dailyProfit = val.profit
 
         // on second opening in same direction
         if (!isOpen && val.direction == val.directionFlag) {
@@ -150,26 +210,15 @@ function takeProfits(data, sp, tp, sl) {
         }
         takenProfit = 0 - secondaryOpenSubtractor
 
-        // if sl defind
-        if (sl != 0 && isOpen) {
-            if (val.minProf - sp - secondaryOpenSubtractor <= sl) {
-                takenProfit = sl - sp
-                closeNext = true
-            }
-        }
-
-        // if tp defind
-        if (tp != 0 && isOpen) {
-            if (val.maxProf - sp - secondaryOpenSubtractor >= tp) {
-                takenProfit = tp - sp
-                closeNext = true
-            }
-        }
+        // todo, join with data from lower time step
+        takenProfit = takeProfitSlTp("sl", takenProfit) 
 
         // take profit on dirction change
         if (i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
             if ( ! closeNext) {
-                    if (val.profit - sp - secondaryOpenSubtractor < tp) { 
+                    if (val.profit - sp - secondaryOpenSubtractor < tp) {
+                        if (secondaryOpenSubtractor != 0) 
+                            test = test + " DIRECTION: " + gbp(val.profit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " < " + gbp(tp)
                     takenProfit = val.profit - sp - secondaryOpenSubtractor
                     secondaryOpenSubtractor = 0
                 } else {
@@ -181,11 +230,6 @@ function takeProfits(data, sp, tp, sl) {
                 secondaryOpenSubtractor = 0
             }
         } 
-
-        // dailies
-        if (isOpen) maxProfit = val.maxProf; else maxProfit = val.maxProf// maxProfit = 0
-        if (isOpen) minProfit = val.minProf; else minProfit = val.minProf// minProfit = 0
-        dailyProfit = val.profit
 
         resultsArr.push({
             date: val.date, 
@@ -199,6 +243,7 @@ function takeProfits(data, sp, tp, sl) {
             maxProfit: maxProfit,
             minProfit: minProfit,
             isOpen: isOpen,
+            test: test
         })
     
     })
