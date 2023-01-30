@@ -73,12 +73,14 @@ function outputWithProfits(data) {
     var redgreen = "#fff"
     var takenProfitStyle = ""
 
-    var output = "<table><tr><th colspan=4></th>" +
-    "<th>Close</th><th>Direction</th>" +
-    "<th>Daily<br> PIPs</th><th>Max<br> PIPs</th><th>Min<br> PIPs</th>" +
-    "<th>Daily<br> GBP</th><th>Max<br> GBP</th><th>Min<br>  GBP</th>" +
-    "<th>Taken<br> PIPs</th><th>Taken<br> GBP</th></tr>" +
-    "<th>Open</th><th>Test></th></tr>"
+    var output = "<table><tr>" +
+    "<th colspan=4></th>" +
+    "<th>Close         </th><th>Direction    </th>" +
+    "<th>Daily<br> PIPs</th><th>Max<br> PIPs </th><th>Min<br> PIPs</th>" +
+    "<th>Daily<br> GBP </th><th>Max<br> GBP  </th><th>Min<br>  GBP</th>" +
+    "<th>Taken<br> PIPs</th><th>Taken<br> GBP</th>" +
+    "<th>Open          </th><th>SL<br>TP     </th><th>Test        </th>" +
+    "</tr>"
 
     arr.forEach( (element, i) => {
 
@@ -130,6 +132,7 @@ function outputWithProfits(data) {
             "<td>" + takenProfitInPips.toFixed()  + "</td>" +
             "<td " + takenProfitStyle + ">" + takenProfitInGBP.toFixed(2)  + "</td>" +
             "<td>" + element.isOpen  + "</td>" +
+            "<td>" + element.slOrTp  + "</td>" +
             "<td>" + element.test + "</td>" +
         "</tr>"
     })
@@ -214,8 +217,7 @@ function outputAvaragesAndPositives(val, currency) {
     var yearlyRow = val.sums.map(val => " " + (com.convertToPips(val, currency) * onePipvalue).toFixed(2))   
     var monthlyRow = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
     
-    var output = "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>"
-    output = output + 
+    var output = 
         "<table>" +
             "<tr><td><strong>TP:</strong></td><td>" + val.tp + "</td>" +
                 "<td><strong>Sl:</strong></td><td>" + val.sl + "</td></tr>" +

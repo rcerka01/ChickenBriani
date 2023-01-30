@@ -38,19 +38,21 @@ module.exports = { run: function (app) {
       res.render("index", { output });
   });
 
-  app.get("/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take", async function(req, res) {
-    var currency = req.params.currency;
-    var step     = req.params.step;
-    var yearFrom = req.params.yearfrom;
-    var yearTo   = req.params.yearto;
-    var spread   = Number(req.params.spread);
-    var tp       = Number(req.params.tp);
-    var sl       = Number(req.params.sl);
+  app.get("/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tp/:sl/take", async function(req, res) {
+    var currency  = req.params.currency;
+    var step      = req.params.step;
+    var lowerStep = req.params.lowerstep;
+    var yearFrom  = req.params.yearfrom;
+    var yearTo    = req.params.yearto;
+    var spread    = Number(req.params.spread);
+    var tp        = Number(req.params.tp);
+    var sl        = Number(req.params.sl);
 
     var currencyData = conf.mapper.find(c => c.name == currency)
     var data = await getData(currency, step, yearFrom, yearTo)
+    var lowerData = await getData(currency, lowerStep, yearFrom, yearTo)
 
-    var dataWithProfits = dataController.takeProfits(data, spread, tp, sl)
+    var dataWithProfits = dataController.takeProfits(data, lowerData, spread, tp, sl)
     var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)
 
     var output = outputController.outputAvaragesAndPositives(

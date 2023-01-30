@@ -118,9 +118,10 @@ function formLines(dataArray, yearFrom, yearTo) {
 /*
  * Public
  */
-function takeProfits(data, sp, tp, sl) {
+function takeProfits(data, lowerData, sp, tp, sl) {
     var currency = data.currencyData
     var days     = data.days
+    var lowerDays     = lowerData.days
 
     // quick util function
     function gbp(val) { return com.toGbp(val, currency).toFixed(2) }
@@ -190,6 +191,20 @@ function takeProfits(data, sp, tp, sl) {
         return profit
     }
 
+    // inner 
+    // create array of arrays for one day data
+    function splitIntoDays(arr) {
+        var result = []
+        var subArr = []
+        arr.forEach( val => {
+            subArr.push(val)
+            if (val.time == "[10:00:00 PM]") { result.push(subArr); subArr = [] }
+        })
+        return result
+    }
+
+    var lowerDaysSplit = splitIntoDays(lowerDays)
+
     days.forEach( (val, i) => {
         test = ""
 
@@ -210,8 +225,14 @@ function takeProfits(data, sp, tp, sl) {
         }
         takenProfit = 0 - secondaryOpenSubtractor
 
-        // todo, join with data from lower time step
-        takenProfit = takeProfitSlTp("sl", takenProfit) 
+        // join with data from lower time step
+        var slOrTp = ""
+        for (ii = 0; ii < lowerDaysSplit[i].length; ii++) {
+            if (lowerDaysSplit[i][ii].minProf <= sl) { slOrTp = "sl"; break }
+            if (lowerDaysSplit[i][ii].maxProf >= tp) { slOrTp = "tp"; break }
+        }
+
+        takenProfit = takeProfitSlTp(slOrTp, takenProfit) 
 
         // take profit on dirction change
         if (i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
@@ -243,6 +264,7 @@ function takeProfits(data, sp, tp, sl) {
             maxProfit: maxProfit,
             minProfit: minProfit,
             isOpen: isOpen,
+            slOrTp: slOrTp,
             test: test
         })
     
