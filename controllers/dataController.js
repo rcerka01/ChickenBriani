@@ -1,6 +1,7 @@
 const conf = require("../config/config");
 const com = require("./commonsController");
 const fs = require('fs');
+const { tests } = require("../config/config");
 
 /*
  * Quick utility, transfer to number with decimal five
@@ -68,18 +69,22 @@ function formLines(dataArray, yearFrom, yearTo) {
             maxProf = purchase - nextMin
             minProf = purchase - nextMax
 
-            test = fix5(purchase) + " - " + fix5(nextClose) + " = <strong>" + fix5(profit)  + "</strong> : " +
-                   fix5(purchase) + " - " + fix5(nextMin) + " = <strong>" + fix5(maxProf) + "</strong> : " +
-                   fix5(purchase) + " - " + fix5(nextMax) + " = <strong>" + fix5(minProf) + "</strong>"
+            if (conf.tests.enabled) {
+                test = fix5(purchase) + " - " + fix5(nextClose) + " = <strong>" + fix5(profit)  + "</strong> : " +
+                    fix5(purchase) + " - " + fix5(nextMin) + " = <strong>" + fix5(maxProf) + "</strong> : " +
+                    fix5(purchase) + " - " + fix5(nextMax) + " = <strong>" + fix5(minProf) + "</strong>"
+            }
 
         } else if (directionFlag == "green") {
             profit  = nextClose - purchase
             maxProf = nextMax - purchase   
             minProf = nextMin - purchase
 
-            test = fix5(nextClose) + " - " + fix5(purchase) + " = <strong>" + fix5(profit)  + "</strong> : " +
-                   fix5(nextMax) + " - " + fix5(purchase) + " = <strong>" + fix5(maxProf) + "</strong> : " +
-                   fix5(nextMin) + " - " + fix5(purchase) + " = <strong>" + fix5(minProf) + "</strong>"
+            if (conf.tests.enabled) {
+                test = fix5(nextClose) + " - " + fix5(purchase) + " = <strong>" + fix5(profit)  + "</strong> : " +
+                    fix5(nextMax) + " - " + fix5(purchase) + " = <strong>" + fix5(maxProf) + "</strong> : " +
+                    fix5(nextMin) + " - " + fix5(purchase) + " = <strong>" + fix5(minProf) + "</strong>"
+            }
         }
 
         return { profit, date, time, weekday, currentClose, direction, directionFlag, test, maxProf, minProf }
@@ -260,23 +265,24 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                             // output
                             slOrTp = "tp";
 
-                            // todo set optional in config
                             // test
-                            var date    = forTheDayArr[ii].date
-                            var time    = forTheDayArr[ii].time
+                            if (conf.tests.enabled) {
+                                var date    = forTheDayArr[ii].date
+                                var time    = forTheDayArr[ii].time
 
-                            if (val.directionFlag == "green") {
-                                test = date + " " + time + 
-                                    "green: " + toTest(highDiff) + 
-                                    " = h:  " + Number(high).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
-                                    " + pp: " + toTest(previousProfit)
+                                if (val.directionFlag == "green") {
+                                    test = date + " " + time + 
+                                        "green: " + toTest(highDiff) + 
+                                        " = h:  " + Number(high).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
+                                        " + pp: " + toTest(previousProfit)
 
-                            } else if (val.directionFlag == "red") {
-                                test = date + " " + time + 
-                                    " red: "  + toTest(highDiff) + 
-                                    " = c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(low).toFixed(5) + 
-                                    " + pp: " + toTest(previousProfit)
-                            }
+                                } else if (val.directionFlag == "red") {
+                                    test = date + " " + time + 
+                                        " red: "  + toTest(highDiff) + 
+                                        " = c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(low).toFixed(5) + 
+                                        " + pp: " + toTest(previousProfit)
+                                }
+                            }     
 
                             // vip
                             closeNext = true
@@ -288,22 +294,23 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                             // output
                             slOrTp      = "sl"; 
 
-                            // todo set optional in config
                             // test
-                            var date    = forTheDayArr[ii].date
-                            var time    = forTheDayArr[ii].time
+                            if (conf.tests.enabled) {
+                                var date    = forTheDayArr[ii].date
+                                var time    = forTheDayArr[ii].time
 
-                            if (val.directionFlag == "green") {
-                                test = date + " " + time + 
-                                    "green: " + toTest(lowDiff) + 
-                                    " = h: "  + Number(low).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
-                                    " + pp: " + toTest(previousProfit)
+                                if (val.directionFlag == "green") {
+                                    test = date + " " + time + 
+                                        "green: " + toTest(lowDiff) + 
+                                        " = h: "  + Number(low).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
+                                        " + pp: " + toTest(previousProfit)
 
-                            } else if (val.directionFlag == "red") {
-                                test = date + " " + time + 
-                                    " red: " + toTest(lowDiff) + 
-                                    " = c: " + Number(val.currentClose).toFixed(5) + " - l: " + Number(high).toFixed(5) + 
-                                    " + pp: " + toTest(previousProfit)
+                                } else if (val.directionFlag == "red") {
+                                    test = date + " " + time + 
+                                        " red: " + toTest(lowDiff) + 
+                                        " = c: " + Number(val.currentClose).toFixed(5) + " - l: " + Number(high).toFixed(5) + 
+                                        " + pp: " + toTest(previousProfit)
+                                }
                             }
 
                             // vip
@@ -325,8 +332,10 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
         if (i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
             if ( ! closeNext) {
                     if (val.profit - sp - secondaryOpenSubtractor < tp) {
-                        if (secondaryOpenSubtractor != 0) 
-                            test = test + " DIRECTION: " + gbp(val.profit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " < " + gbp(tp)
+                        if (conf.tests.enabled) {
+                            if (secondaryOpenSubtractor != 0) 
+                                test = test + " DIRECTION: " + gbp(val.profit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " < " + gbp(tp)
+                        }
                     takenProfit = val.profit - sp - secondaryOpenSubtractor
                     secondaryOpenSubtractor = 0
                 } else {

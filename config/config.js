@@ -32,5 +32,9 @@ module.exports = {
 
     ],
 
+    tests: {
+        enabled: false
+    },
+
     mapper: currencies.mapper,
 }
