@@ -21,8 +21,8 @@ module.exports = { run: function (app) {
       "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/60/2021/2023/0/34/-30/take'>http://localhost:3000/GBPCHF/1D/60/2021/2023/0/34/-30/take</a><br>" +
       "/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tp/:sl/take<br><br>" +
 
-      "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/2022/2023/2/10/200/10/-500/-10/10/multiple'>http://localhost:3000/GBPCHF/1D/2022/2023/2/10/200/10/-500/-10/10/multiple</a><br>" +
-      "/:currency/:step/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple<br><br>" +
+      "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/60/2022/2023/2/0/60/5/-300/-20/20/multiple'>http://localhost:3000/GBPCHF/1D/60/2022/2023/2/0/60/5/-300/-20/20/multiple</a><br>" +
+      "/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple<br><br>" +
       "</p>"
     res.render("index", { output });
   });
@@ -65,9 +65,10 @@ module.exports = { run: function (app) {
     res.render("index", { output }); 
   });
 
-  app.get("/:currency/:step/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple", async function(req, res) {
+  app.get("/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple", async function(req, res) {
     var currency = req.params.currency;
     var step     = req.params.step;
+    var lowerStep = req.params.lowerstep;
     var yearFrom = req.params.yearfrom;
     var yearTo   = req.params.yearto;
     var spread   = Number(req.params.spread);
@@ -79,7 +80,10 @@ module.exports = { run: function (app) {
     var slstep   = Number(req.params.slstep);
 
     var currencyData = conf.mapper.find(c => c.name == currency)
-    var data = await getData(currency, step, yearFrom, yearTo)
+    // uses readLine
+    var data =      await getData(currency, step,      yearFrom, yearTo)
+    // uses readLineSmple
+    var lowerData = await getData(currency, lowerStep, yearFrom, yearTo, true)
 
     var outputs = []
     var output  = ""
@@ -87,7 +91,7 @@ module.exports = { run: function (app) {
     for (var i=tpfrom; i<=tptill; i=i+tpstep) {
       for (var ii=slfrom; ii<=sltill; ii=ii+slstep) {
 
-        var dataWithProfits = dataController.takeProfits(data, spread, i, ii)
+        var dataWithProfits = dataController.takeProfits(data, lowerData, spread, i, ii)
         var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)
 
         outputs.push(dataController.countAvaregesAndPositives(byYear, i, ii))
