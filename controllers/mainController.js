@@ -54,7 +54,7 @@ module.exports = { run: function (app) {
     // uses readLineSmple
     var lowerData = await getData(currency, lowerStep, yearFrom, yearTo, true)
 
-    var dataWithProfits = dataController.takeProfits(data, lowerData, spread, tp, sl)
+    var dataWithProfits = dataController.takeProfits(data, lowerData, lowerStep, spread, tp, sl)
     var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)
 
     var output = outputController.outputAvaragesAndPositives(
@@ -66,18 +66,18 @@ module.exports = { run: function (app) {
   });
 
   app.get("/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple", async function(req, res) {
-    var currency = req.params.currency;
-    var step     = req.params.step;
+    var currency  = req.params.currency;
+    var step      = req.params.step;
     var lowerStep = req.params.lowerstep;
-    var yearFrom = req.params.yearfrom;
-    var yearTo   = req.params.yearto;
-    var spread   = Number(req.params.spread);
-    var tpfrom   = Number(req.params.tpfrom);
-    var tptill   = Number(req.params.tptill);
-    var tpstep   = Number(req.params.tpstep);
-    var slfrom   = Number(req.params.slfrom);
-    var sltill   = Number(req.params.sltill);
-    var slstep   = Number(req.params.slstep);
+    var yearFrom  = req.params.yearfrom;
+    var yearTo    = req.params.yearto;
+    var spread    = Number(req.params.spread);
+    var tpfrom    = Number(req.params.tpfrom);
+    var tptill    = Number(req.params.tptill);
+    var tpstep    = Number(req.params.tpstep);
+    var slfrom    = Number(req.params.slfrom);
+    var sltill    = Number(req.params.sltill);
+    var slstep    = Number(req.params.slstep);
 
     var currencyData = conf.mapper.find(c => c.name == currency)
     // uses readLine
@@ -91,7 +91,7 @@ module.exports = { run: function (app) {
     for (var i=tpfrom; i<=tptill; i=i+tpstep) {
       for (var ii=slfrom; ii<=sltill; ii=ii+slstep) {
 
-        var dataWithProfits = dataController.takeProfits(data, lowerData, spread, i, ii)
+        var dataWithProfits = dataController.takeProfits(data, lowerData, lowerStep, spread, i, ii)
         var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)
 
         outputs.push(dataController.countAvaregesAndPositives(byYear, i, ii))

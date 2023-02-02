@@ -1,3 +1,4 @@
+const conf = require("../config/config");
 const com = require("./commonsController");
 const fs = require('fs');
 
@@ -144,7 +145,7 @@ function formLines(dataArray, yearFrom, yearTo) {
 /*
  * Public
  */
-function takeProfits(data, lowerData, sp, tp, sl) {
+function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
     var currency  = data.currencyData
     var days      = data.days
     var lowerDays = lowerData.days
@@ -179,8 +180,7 @@ function takeProfits(data, lowerData, sp, tp, sl) {
         var subArr = []
         arr.forEach( val => {
             subArr.push(val)
-            // todo
-            if (val.time == "[10:00:00 PM]") { result.push(subArr); subArr = [] }
+            if (val.time == conf.lowerTimeSplitKey) { result.push(subArr); subArr = [] }
         })
         return result
     }
@@ -218,14 +218,16 @@ function takeProfits(data, lowerData, sp, tp, sl) {
         // is sl or tp happen first, or day is closed
         var slOrTp = "close"
 
-        // look fot tp or sl only if day is open
+        // look for tp or sl only if day is open
         if (isOpen) {
+
+            // find key parameters to korrectly split lower data array
+            var keyParam = conf.lowerTimeSteps.find(p => p.step == lowerStep)
 
             // find lower data for the day
             var forTheDayArr = []
             if (i + 1 < days.length) {
-                // todo
-                forTheDayArr = lowerDaysSplit.find(ld => ld[3] !== void 0 && ld[3].time == "[2:00:00 AM]" && ld[3].date == days[i + 1].date)
+                forTheDayArr = lowerDaysSplit.find(ld => ld[keyParam.position] !== void 0 && ld[keyParam.position].time == keyParam.key && ld[3].date == days[i + 1].date)
             }
 
             // if previous trade is open, but tp or sl is not riched. Get as last item of now generated results array
@@ -233,7 +235,6 @@ function takeProfits(data, lowerData, sp, tp, sl) {
             // if prev day was open and profit was not taken
             if (resultsArr.length > 0 && prevDayItem.takenProfit == 0 && prevDayItem.isOpen) var previousProfit = prevDayItem.dailyProfit
             else var previousProfit = 0
-
 
             // loop  to find tp or sl in lower step data
             if (forTheDayArr !== undefined) {
