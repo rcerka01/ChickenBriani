@@ -75,11 +75,11 @@ function outputWithProfits(data) {
 
     var output = "<table><tr>" +
     "<th colspan=4></th>" +
-    "<th>Close         </th><th>Direction    </th>" +
-    "<th>Daily<br> PIPs</th><th>Max<br> PIPs </th><th>Min<br> PIPs</th>" +
-    "<th>Daily<br> GBP </th><th>Max<br> GBP  </th><th>Min<br>  GBP</th>" +
-    "<th>Taken<br> PIPs</th><th>Taken<br> GBP</th>" +
-    "<th>Open          </th><th>SL<br>TP     </th><th>Test        </th>" +
+    "<th>Close         </th><th>Direction     </th>" +
+    "<th>Daily<br> PIPs</th><th>Max<br> PIPs  </th><th>Min<br> PIPs</th>"  +
+    "<th>Daily<br> GBP </th><th>Max<br> GBP   </th><th>Min<br> GBP </th>"  +
+    "<th>Taken<br> PIPs</th><th>Taken<br> GBP </th>" +
+    "<th>Open          </th><th>SL<br>TP      </th><th>Test        </th>"
     "</tr>"
 
     arr.forEach( (element, i) => {

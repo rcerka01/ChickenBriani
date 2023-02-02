@@ -9,12 +9,13 @@ function fix5(n) { return Number(n).toFixed(5) }
 /*
  * Public
  */
-const readFile = async (path, yearFrom, yearTo) => {
+const readFile = async (path, yearFrom, yearTo, isSimple) => {
     try {
         const data = await fs.promises.readFile(path, 'utf8')
         var dataArray = data.split(/\r?\n/);
         dataArray.shift();
-        return formLines(dataArray, yearFrom, yearTo)
+        if (isSimple) return formLinesSimple(dataArray, yearFrom, yearTo)
+        else return formLines(dataArray, yearFrom, yearTo)
     }
     catch (err) {
         console.log(err)
@@ -22,7 +23,32 @@ const readFile = async (path, yearFrom, yearTo) => {
 }
 
 /*
- * 
+ * For lower time step
+ */
+function formLinesSimple(dataArray, yearFrom, yearTo) {
+    var days = []
+
+    dataArray.forEach( line => {
+        // current line
+        var lineArr = line.split(",") 
+
+        var ts           = lineArr[0]
+        var date         = com.convertDateFromUnixTimestamp(Number(ts), 0)
+        var time         = com.convertTimeFromUnixTimestamp(Number(ts), 0)
+        var currentClose = lineArr[4]
+        var high         = lineArr[2]
+        var low          = lineArr[3]
+
+        if (com.dateToYear(date) >= yearFrom && com.dateToYear(date) <= yearTo) {
+            days.push({ date, time, currentClose, high, low })
+        }
+    })
+
+return { days }
+}
+
+/*
+ * Main, 1D time step
  */
 function formLines(dataArray, yearFrom, yearTo) {
     var direction     = ""
@@ -74,9 +100,9 @@ function formLines(dataArray, yearFrom, yearTo) {
         var currentGreenSignal = lineArr[8]
 
         var ts  = lineArr[0]
-        var convertedDate = com.convertDateFromUnixTimestamp(Number(ts))
-        var convertedTime = com.convertTimeFromUnixTimestamp(Number(ts))
-        var weekday       = com.getWeekdayFromUnixTimestamp(Number(ts))
+        var convertedDate = com.convertDateFromUnixTimestamp(Number(ts), 1)
+        var convertedTime = com.convertTimeFromUnixTimestamp(Number(ts), 1)
+        var weekday       = com.getWeekdayFromUnixTimestamp(Number(ts), 1)
 
         if (com.dateToYear(convertedDate) >= yearFrom && com.dateToYear(convertedDate) <= yearTo) {
             // to check if last linecan be closed
@@ -119,9 +145,14 @@ function formLines(dataArray, yearFrom, yearTo) {
  * Public
  */
 function takeProfits(data, lowerData, sp, tp, sl) {
-    var currency = data.currencyData
-    var days     = data.days
-    var lowerDays     = lowerData.days
+    var currency  = data.currencyData
+    var days      = data.days
+    var lowerDays = lowerData.days
+
+    // quick utils
+    function toGbp(val) { return com.toGbp(val, currency).toFixed(2) }
+    function toPip(val) { return com.convertToPips(val, currency).toFixed(1) }
+    function toTest(val) { return "<strong>" + toPip(val) + "</strong>(" + toGbp(val) + ")" }
 
     // quick util function
     function gbp(val) { return com.toGbp(val, currency).toFixed(2) }
@@ -141,70 +172,25 @@ function takeProfits(data, lowerData, sp, tp, sl) {
     tp = com.gbpToChartValue(currency, tp)
     sl = com.gbpToChartValue(currency, sl)
 
-    // inner
-    // swap over
-    function takeProfitSlTp(first, takenProfit) {
-        var profit = takenProfit
-
-        if (first == "tp") {
-            // if sl defined
-            if (sl != 0 && isOpen) {
-                if (minProfit - sp - secondaryOpenSubtractor <= sl) {
-                    if (secondaryOpenSubtractor != 0) 
-                        test = test + " SL: " + gbp(minProfit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " <= " + gbp(sl)
-                    closeNext = true
-                    profit = sl - sp
-                }
-            }
-
-            // if tp defined
-            if (tp != 0 && isOpen) {
-                if (maxProfit - sp - secondaryOpenSubtractor >= tp) {
-                    if (secondaryOpenSubtractor != 0) 
-                        test = test + " TP: " + gbp(maxProfit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " >= " + gbp(tp)
-                    closeNext = true
-                    profit = tp - sp
-                }
-            }
-        } else {
-            // if tp defined
-            if (tp != 0 && isOpen) {
-                if (maxProfit - sp - secondaryOpenSubtractor >= tp) {
-                    if (secondaryOpenSubtractor != 0) 
-                        test = test + " Tp: " + gbp(maxProfit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " >= " + gbp(tp)
-                    closeNext = true
-                    profit = tp - sp
-                }
-            }
-
-            // if sl defined
-            if (sl != 0 && isOpen) {
-                if (minProfit - sp - secondaryOpenSubtractor <= sl) {
-                    if (secondaryOpenSubtractor != 0) 
-                        test = test + " SL: " + gbp(minProfit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " <= " + gbp(sl)
-                    closeNext = true
-                    profit = sl - sp
-                }
-            }
-        }
-
-        return profit
-    }
-
     // inner 
-    // create array of arrays for one day data
+    // create array of arrays for one day with lower timestep data
     function splitIntoDays(arr) {
         var result = []
         var subArr = []
         arr.forEach( val => {
             subArr.push(val)
+            // todo
             if (val.time == "[10:00:00 PM]") { result.push(subArr); subArr = [] }
         })
         return result
     }
 
+    // get lowertimestep data
     var lowerDaysSplit = splitIntoDays(lowerDays)
-
+     
+    //
+    // loop begins
+    //
     days.forEach( (val, i) => {
         test = ""
 
@@ -224,17 +210,117 @@ function takeProfits(data, lowerData, sp, tp, sl) {
             secondaryOpenSubtractor = days[i - 1].profit + secondaryOpenSubtractor
         }
         takenProfit = 0 - secondaryOpenSubtractor
-
+       
+        //
         // join with data from lower time step
-        var slOrTp = ""
-        for (ii = 0; ii < lowerDaysSplit[i].length; ii++) {
-            if (lowerDaysSplit[i][ii].minProf <= sl) { slOrTp = "sl"; break }
-            if (lowerDaysSplit[i][ii].maxProf >= tp) { slOrTp = "tp"; break }
+        //
+
+        // is sl or tp happen first, or day is closed
+        var slOrTp = "close"
+
+        // look fot tp or sl only if day is open
+        if (isOpen) {
+
+            // find lower data for the day
+            var forTheDayArr = []
+            if (i + 1 < days.length) {
+                // todo
+                forTheDayArr = lowerDaysSplit.find(ld => ld[3] !== void 0 && ld[3].time == "[2:00:00 AM]" && ld[3].date == days[i + 1].date)
+            }
+
+            // if previous trade is open, but tp or sl is not riched. Get as last item of now generated results array
+            var prevDayItem = resultsArr[resultsArr.length - 1]
+            // if prev day was open and profit was not taken
+            if (resultsArr.length > 0 && prevDayItem.takenProfit == 0 && prevDayItem.isOpen) var previousProfit = prevDayItem.dailyProfit
+            else var previousProfit = 0
+
+
+            // loop  to find tp or sl in lower step data
+            if (forTheDayArr !== undefined) {
+                for (var ii = 0; ii < forTheDayArr.length; ii++) {
+                    if (forTheDayArr[ii] !== void 0 && i > 0) {
+
+                        // each step low and high
+                        var high = Number(forTheDayArr[ii].high)
+                        var low  = Number(forTheDayArr[ii].low)
+
+                        // red green
+                        if (val.directionFlag == "green") {
+                            var highDiff    = high - Number(val.currentClose) + previousProfit
+                            var lowDiff     = low  - Number(val.currentClose) + previousProfit
+
+                        } else if (val.directionFlag == "red") {
+                            var highDiff    = Number(val.currentClose) - low  + previousProfit
+                            var lowDiff     = Number(val.currentClose) - high + previousProfit
+                        }
+
+                        // add tp and sl to takenProfit
+                        if (highDiff >= tp) {
+                            // output
+                            slOrTp = "tp";
+
+                            // todo set optional in config
+                            // test
+                            var date    = forTheDayArr[ii].date
+                            var time    = forTheDayArr[ii].time
+
+                            if (val.directionFlag == "green") {
+                                test = date + " " + time + 
+                                    "green: " + toTest(highDiff) + 
+                                    " = h:  " + Number(high).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
+                                    " + pp: " + toTest(previousProfit)
+
+                            } else if (val.directionFlag == "red") {
+                                test = date + " " + time + 
+                                    " red: "  + toTest(highDiff) + 
+                                    " = c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(low).toFixed(5) + 
+                                    " + pp: " + toTest(previousProfit)
+                            }
+
+                            // vip
+                            closeNext = true
+                            takenProfit = tp - sp
+                            break; 
+                        }
+
+                        if (lowDiff <= sl) {
+                            // output
+                            slOrTp      = "sl"; 
+
+                            // todo set optional in config
+                            // test
+                            var date    = forTheDayArr[ii].date
+                            var time    = forTheDayArr[ii].time
+
+                            if (val.directionFlag == "green") {
+                                test = date + " " + time + 
+                                    "green: " + toTest(lowDiff) + 
+                                    " = h: "  + Number(low).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
+                                    " + pp: " + toTest(previousProfit)
+
+                            } else if (val.directionFlag == "red") {
+                                test = date + " " + time + 
+                                    " red: " + toTest(lowDiff) + 
+                                    " = c: " + Number(val.currentClose).toFixed(5) + " - l: " + Number(high).toFixed(5) + 
+                                    " + pp: " + toTest(previousProfit)
+                            }
+
+                            // vip
+                            closeNext = true
+                            takenProfit = sl - sp
+                            break;                        
+                        }
+                    }
+
+                    slOrTp = "far"
+                }
+            }
+        // is open
         }
 
-        takenProfit = takeProfitSlTp(slOrTp, takenProfit) 
-
+        // 
         // take profit on dirction change
+        //
         if (i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
             if ( ! closeNext) {
                     if (val.profit - sp - secondaryOpenSubtractor < tp) {
@@ -265,7 +351,7 @@ function takeProfits(data, lowerData, sp, tp, sl) {
             minProfit: minProfit,
             isOpen: isOpen,
             slOrTp: slOrTp,
-            test: test
+            test: test,
         })
     
     })

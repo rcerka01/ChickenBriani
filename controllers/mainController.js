@@ -3,10 +3,10 @@ const dataController   = require("./dataController")
 const outputController   = require("./outputController")
 const com = require("./commonsController");
 
-async function getData(currency, step, yearFrom, yearTo) { 
+async function getData(currency, step, yearFrom, yearTo, isSimple) { 
   var path = conf.fileName.path + conf.fileName.prefix + currency + conf.fileName.join + step + ".csv"
   var currencyData = conf.mapper.find(c => c.name == currency)
-  var items = await dataController.readFile(path, yearFrom, yearTo)
+  var items = await dataController.readFile(path, yearFrom, yearTo, isSimple)
   return { days: items.days, currencyData }
 }
 
@@ -18,8 +18,8 @@ module.exports = { run: function (app) {
       "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/2023/2023/raw'>http://localhost:3000/GBPCHF/1D/2023/2023/raw</a><br>" +
       "/:currency/:step/:yearfrom/:yearto/raw <br><br>" +
 
-      "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/2023/2023/0/10000/-10000/take'>http://localhost:3000/GBPCHF/1D/2023/2023/0/10000/-10000/take</a><br>" +
-      "/:currency/:step/:yearfrom/:yearto/:spread/:tp/:sl/take<br><br>" +
+      "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/60/2021/2023/0/34/-30/take'>http://localhost:3000/GBPCHF/1D/60/2021/2023/0/34/-30/take</a><br>" +
+      "/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tp/:sl/take<br><br>" +
 
       "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/2022/2023/2/10/200/10/-500/-10/10/multiple'>http://localhost:3000/GBPCHF/1D/2022/2023/2/10/200/10/-500/-10/10/multiple</a><br>" +
       "/:currency/:step/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple<br><br>" +
@@ -49,8 +49,10 @@ module.exports = { run: function (app) {
     var sl        = Number(req.params.sl);
 
     var currencyData = conf.mapper.find(c => c.name == currency)
-    var data = await getData(currency, step, yearFrom, yearTo)
-    var lowerData = await getData(currency, lowerStep, yearFrom, yearTo)
+    // uses readLine
+    var data =      await getData(currency, step,      yearFrom, yearTo)
+    // uses readLineSmple
+    var lowerData = await getData(currency, lowerStep, yearFrom, yearTo, true)
 
     var dataWithProfits = dataController.takeProfits(data, lowerData, spread, tp, sl)
     var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)

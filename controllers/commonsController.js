@@ -3,13 +3,13 @@ const fs = require('fs');
 
 // used in formLines function
 // 86400000 one day in milliseconds, needed because of Team Wiever error
-function convertDateFromUnixTimestamp(unixTimestamp) {
-    var date = new Date(unixTimestamp * 1000 + 86400000);
+function convertDateFromUnixTimestamp(unixTimestamp, addDays) {
+    var date = new Date(unixTimestamp * 1000 + 86400000 * addDays);
     return "[" + date.toLocaleDateString("en-UK") + "]"
 }
       
-function convertTimeFromUnixTimestamp(unixTimestamp) {
-    var date = new Date(unixTimestamp * 1000 + 86400000);
+function convertTimeFromUnixTimestamp(unixTimestamp, addDays) {
+    var date = new Date(unixTimestamp * 1000 + 86400000 * addDays);
     return "[" + date.toLocaleTimeString("en-UK") + "]"
 }
 
@@ -21,8 +21,8 @@ function dateToMonth(date) {
     return date.split("/")[0].substring(1)
 }
 
-function getWeekdayFromUnixTimestamp(unixTimestamp) {
-    var date = new Date(unixTimestamp * 1000 + 86400000);
+function getWeekdayFromUnixTimestamp(unixTimestamp, addDays) {
+    var date = new Date(unixTimestamp * 1000 + 86400000 * addDays);
     var weekdays = ["Su","Mo","Tu","We","Th","Fr","Sa",]
     return weekdays[date.getDay()]
 }
