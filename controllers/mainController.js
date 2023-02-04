@@ -21,7 +21,7 @@ module.exports = { run: function (app) {
       "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/60/2021/2023/0/34/-30/take'>http://localhost:3000/GBPCHF/1D/60/2021/2023/0/34/-30/take</a><br>" +
       "/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tp/:sl/take<br><br>" +
 
-      "<a target='_blank' href='http://localhost:3000/GBPCHF/1D/60/2022/2023/2/0/60/5/-300/-20/20/multiple'>http://localhost:3000/GBPCHF/1D/60/2022/2023/2/0/60/5/-300/-20/20/multiple</a><br>" +
+      "<a target='_blank' href='http://localhost:3000/EURUSD/1D/240/2016/2023/1/0/80/2/-200/-10/5/multiple'>http://localhost:3000/EURUSD/1D/240/2016/2023/1/0/80/2/-200/-10/5/multiple</a><br>" +
       "/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple<br><br>" +
       "</p>"
     res.render("index", { output });

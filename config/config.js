@@ -33,7 +33,7 @@ module.exports = {
     ],
 
     tests: {
-        enabled: false
+        enabled: true
     },
 
     mapper: currencies.mapper,

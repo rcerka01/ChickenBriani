@@ -214,6 +214,11 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
             isOpen = true
             secondaryOpenSubtractor = days[i - 1].profit + secondaryOpenSubtractor
         }
+
+        // set zero if trade vas close before direction change
+        if (i - 1 > 0 && !days[i - 1].isOpen && days[i - 1].directionFlag != val.directionFlag) { secondaryOpenSubtractor = 0 }
+
+        // set takenProfit to zero or secondary open
         takenProfit = 0 - secondaryOpenSubtractor
        
         //
@@ -329,23 +334,23 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
         // 
         // take profit on dirction change
         //
-        if (i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
+        if (isOpen && i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
             if ( ! closeNext) {
-                    if (val.profit - sp - secondaryOpenSubtractor < tp) {
-                        if (conf.tests.enabled) {
-                            if (secondaryOpenSubtractor != 0) 
-                                test = test + " DIRECTION: " + gbp(val.profit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " < " + gbp(tp)
-                        }
+                if (val.profit - sp - secondaryOpenSubtractor < tp) {
+                    if (conf.tests.enabled) {
+                        test = test + " DIRECTION: " + gbp(val.profit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " < " + gbp(tp)
+                    }
                     takenProfit = val.profit - sp - secondaryOpenSubtractor
-                    secondaryOpenSubtractor = 0
                 } else {
+                    if (conf.tests.enabled) {
+                        test = test + " DIRECTION (TP): " + gbp(val.profit) + " - " + gbp(sp) + " - " + gbp(secondaryOpenSubtractor) + " < " + gbp(tp)
+                    }
                     takenProfit = tp - sp;
-                    secondaryOpenSubtractor = 0
                 }
             } else {
                 openNext = true
-                secondaryOpenSubtractor = 0
             }
+            secondaryOpenSubtractor = 0
         } 
 
         resultsArr.push({
