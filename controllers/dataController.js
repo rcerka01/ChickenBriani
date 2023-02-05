@@ -215,11 +215,11 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
             secondaryOpenSubtractor = days[i - 1].profit + secondaryOpenSubtractor
         }
 
-        // set zero if trade vas close before direction change
+        // set zero if trade was close before direction change
         if (i - 1 > 0 && !days[i - 1].isOpen && days[i - 1].directionFlag != val.directionFlag) { secondaryOpenSubtractor = 0 }
 
         // set takenProfit to zero or secondary open
-        takenProfit = 0 - secondaryOpenSubtractor
+        takenProfit = 0 
        
         //
         // join with data from lower time step
@@ -243,7 +243,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
             // if previous trade is open, but tp or sl is not riched. Get as last item of now generated results array
             var prevDayItem = resultsArr[resultsArr.length - 1]
             // if prev day was open and profit was not taken
-            if (resultsArr.length > 0 && prevDayItem.takenProfit == 0 && prevDayItem.isOpen) var previousProfit = prevDayItem.dailyProfit
+            if (resultsArr.length > 0 && prevDayItem.takenProfit == 0) var previousProfit = prevDayItem.dailyProfit
             else var previousProfit = 0
 
             // loop  to find tp or sl in lower step data
@@ -257,12 +257,12 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
 
                         // red green
                         if (val.directionFlag == "green") {
-                            var highDiff    = high - Number(val.currentClose) + previousProfit
-                            var lowDiff     = low  - Number(val.currentClose) + previousProfit
+                            var highDiff    = high - Number(val.currentClose) + previousProfit - secondaryOpenSubtractor
+                            var lowDiff     = low  - Number(val.currentClose) + previousProfit - secondaryOpenSubtractor
 
                         } else if (val.directionFlag == "red") {
-                            var highDiff    = Number(val.currentClose) - low  + previousProfit
-                            var lowDiff     = Number(val.currentClose) - high + previousProfit
+                            var highDiff    = Number(val.currentClose) - low  + previousProfit - secondaryOpenSubtractor
+                            var lowDiff     = Number(val.currentClose) - high + previousProfit - secondaryOpenSubtractor
                         }
 
                         // add tp and sl to takenProfit
@@ -279,19 +279,23 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                                     test = date + " " + time + 
                                         "green: " + toTest(highDiff) + 
                                         " = h:  " + Number(high).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
-                                        " + pp: " + toTest(previousProfit)
+                                        " + pp: " + toTest(previousProfit) +
+                                        " - ss: " + toTest(secondaryOpenSubtractor)
+
 
                                 } else if (val.directionFlag == "red") {
                                     test = date + " " + time + 
                                         " red: "  + toTest(highDiff) + 
                                         " = c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(low).toFixed(5) + 
-                                        " + pp: " + toTest(previousProfit)
+                                        " + pp: " + toTest(previousProfit) +
+                                        " - ss: " + toTest(secondaryOpenSubtractor)
                                 }
                             }     
 
                             // vip
                             closeNext = true
                             takenProfit = tp - sp
+                            secondaryOpenSubtractor = 0
                             break; 
                         }
 
@@ -308,24 +312,32 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                                     test = date + " " + time + 
                                         "green: " + toTest(lowDiff) + 
                                         " = h: "  + Number(low).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
-                                        " + pp: " + toTest(previousProfit)
+                                        " + pp: " + toTest(previousProfit) +
+                                        " - ss: " + toTest(secondaryOpenSubtractor)
 
                                 } else if (val.directionFlag == "red") {
                                     test = date + " " + time + 
-                                        " red: " + toTest(lowDiff) + 
-                                        " = c: " + Number(val.currentClose).toFixed(5) + " - l: " + Number(high).toFixed(5) + 
-                                        " + pp: " + toTest(previousProfit)
+                                        " red: "  + toTest(lowDiff) + 
+                                        " = c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(high).toFixed(5) + 
+                                        " + pp: " + toTest(previousProfit) +
+                                        " - ss: " + toTest(secondaryOpenSubtractor)
                                 }
                             }
 
                             // vip
                             closeNext = true
                             takenProfit = sl - sp
+                            secondaryOpenSubtractor = 0
                             break;                        
                         }
                     }
 
+                    // output
                     slOrTp = "far"
+                    // test
+                    if (conf.tests.enabled) {
+                        test = "secondary open subtractor: " + toGbp(secondaryOpenSubtractor)
+                    }
                 }
             }
         // is open
@@ -351,7 +363,10 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                 openNext = true
             }
             secondaryOpenSubtractor = 0
-        } 
+        }
+        
+        // fix all takenProfits to zero if close
+        if (!isOpen) { takenProfit = 0 }
 
         resultsArr.push({
             date: val.date, 
