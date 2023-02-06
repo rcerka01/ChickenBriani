@@ -1,3 +1,3 @@
 export default {
-    filePath: "notset"
+    filePath: "tests/data/"
 }
