@@ -1,14 +1,17 @@
 import currencies from "./currencies.js"
 
+if (process.env.NODE_ENV === "test") var envConf = await import('./config.test.js')
+else var envConf = await import('./config.prod.js')
+
 export default {
     app: {
         port: 3000
     },
 
     fileName: {
-        path: "/home/ray/Downloads/",
         prefix: "FX_",
-        join: ",\ "
+        join: ",\ ",
+        path: envConf.default.filePath
     },
 
     lowerTimeSplitKey: "[10:00:00 PM]",

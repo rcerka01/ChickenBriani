@@ -2,11 +2,11 @@ import request from 'supertest'
 import app from '../app.js'
 
 
-describe("GET /path", () => {
-  describe("title page works", () => {
+describe("GETxx /xxx", () => {
+  describe("title page worksxxx", () => {
 
-    test("should respond with a 200 status code", async () => {
-      const response = await request(app).get("/").send()
+    test("should respond with a 200 status codexxx", async () => {
+      const response = await request(app).get("/GBPCHF/1D/2023/2023/raw").send()
       expect(response.statusCode).toBe(200)
     })
     // test("should specify json in the content type header", async () => {
