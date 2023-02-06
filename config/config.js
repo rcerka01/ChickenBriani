@@ -14,29 +14,29 @@ export default {
         path: envConf.default.filePath
     },
 
-    lowerTimeSplitKey: "[10:00:00 PM]",
+    lowerTimeSplitKey: "[22:00:00]",
 
     lowerTimeSteps: [
         { 
             step: 60,
             position: 3,
-            key: "[2:00:00 AM]"
+            key: "[02:00:00]"
         },
         {
             step: 120,
             position: 1,
-            key: "[2:00:00 AM]"
+            key: "[02:00:00]"
         },
         {
             step: 240,
             position: 0,
-            key: "[2:00:00 AM]"
+            key: "[02:00:00]"
         }
 
     ],
 
     tests: {
-        enabled: false
+        enabled: true
     },
 
     mapper: currencies.mapper,
