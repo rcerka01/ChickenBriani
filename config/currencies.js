@@ -19,7 +19,7 @@ const toGBP = {
     SEK: 0.079
 }
 
-module.exports = {
+export default {
     mapper: [
         // MAJOR
         // used in past

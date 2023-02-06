@@ -1,7 +1,7 @@
-const conf             = require("../config/config");
-const dataController   = require("./dataController")
-const outputController   = require("./outputController")
-const com = require("./commonsController");
+import conf from "../config/config.js"
+import dataController from "./dataController.js"
+import outputController from "./outputController.js"
+import com from "./commonsController.js"
 
 async function getData(currency, step, yearFrom, yearTo, isSimple) { 
   var path = conf.fileName.path + conf.fileName.prefix + currency + conf.fileName.join + step + ".csv"
@@ -10,7 +10,7 @@ async function getData(currency, step, yearFrom, yearTo, isSimple) {
   return { days: items.days, currencyData }
 }
 
-module.exports = { run: function (app) {
+export default { run: function (app) {
 
   app.get("/", async function(req, res) {
     var output = 

@@ -1,6 +1,3 @@
-const conf = require("../config/config");
-const fs = require('fs');
-
 // used in formLines function
 // 86400000 one day in milliseconds, needed because of Team Wiever error
 function convertDateFromUnixTimestamp(unixTimestamp, addDays) {
@@ -56,7 +53,7 @@ function toGbp(val, currency) {
     return convertToPips(val, currency) * getOnePipValueGbp(currency)
 }
 
-module.exports = {
+export default {
     getWeekdayFromUnixTimestamp,
     gbpToChartValue,
     arrSum,

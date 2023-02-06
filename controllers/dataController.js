@@ -1,7 +1,6 @@
-const conf = require("../config/config");
-const com = require("./commonsController");
-const fs = require('fs');
-const { tests } = require("../config/config");
+import conf from "../config/config.js"
+import com from "./commonsController.js"
+import fs from 'fs'
 
 /*
  * Quick utility, transfer to number with decimal five
@@ -433,7 +432,7 @@ function countAvaregesAndPositives(data, tp, sl) {
     return { tp, sl, monthlyProfits, positives, total, sums, arrCountMinProfit: data.arr }
 }
 
-module.exports = {
+export default {
     readFile,
     takeProfits,
     profitsByYear,

@@ -1,6 +1,6 @@
-const currencies = require("./currencies");
+import currencies from "./currencies.js"
 
-module.exports = {
+export default {
     app: {
         port: 3000
     },

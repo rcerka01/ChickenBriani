@@ -1,4 +1,4 @@
-const com = require("./commonsController");
+import com from "./commonsController.js"
 
 /*
  * Inner. Used in rawOutput and outputProfitsByYear
@@ -234,7 +234,7 @@ function outputAvaragesAndPositives(val, currency) {
 }
 
 
-module.exports = {
+export default {
     rawOutput,
     outputWithProfits,
     outputProfitsByYear,
