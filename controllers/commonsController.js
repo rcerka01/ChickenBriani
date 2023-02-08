@@ -37,13 +37,6 @@ function gbpToChartValue(currency, gbp) {
     return gbp / currency.pipToGBP / currency.value / currency.lot
 }
 
-// used in profitsByYear
-function arrSum(val) {
-    if (val.length > 0) {
-        return val.reduce((a, b) => Number(a) + Number(b))
-    } else return 0
-}
-
 // used in outputProfitsByYear
 function convertToPips(val, currency) {
     return val / currency.pip
@@ -51,6 +44,13 @@ function convertToPips(val, currency) {
 
 function toGbp(val, currency) {
     return convertToPips(val, currency) * getOnePipValueGbp(currency)
+}
+
+// used in profitsByYear
+function arrSum(val) {
+    if (val.length > 0) {
+        return val.reduce((a, b) => Number(a) + Number(b))
+    } else return 0
 }
 
 export default {

@@ -155,6 +155,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
     var lowerDays = lowerData.days
 
     // quick utils
+    // todo move up at beggining
     function toGbp(val) { return com.toGbp(val, currency).toFixed(2) }
     function toPip(val) { return com.convertToPips(val, currency).toFixed(1) }
     function toTest(val) { return "<strong>" + toPip(val) + "</strong>(" + toGbp(val) + ")" }
@@ -380,6 +381,8 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
             minProfit: minProfit,
             isOpen: isOpen,
             slOrTp: slOrTp,
+            lowerDate: date,
+            lowerTime: time,
             test: test,
         })
     
