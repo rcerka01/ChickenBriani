@@ -26,7 +26,8 @@ const tp4 = 30
 const sl4 = -30
 const spread4 = 2.5
 const response4 = await request(app).get("/GBPCHF/1D/60/2021/2023/" + spread4 + "/" + tp4 + "/" + sl4 + "/take").send()
-const data4 = response4.body.byYear
+const data4byYear = response4.body.byYear
+const data4profits = response4.body.dataWithProfits.arr
 
 // quick util
 function toGbp(val) { return Number(com.toGbp(val, currency1).toFixed(2)) }
@@ -243,11 +244,44 @@ describe("GET /GBPCHF/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
       // todo
     })
 
+    // BY YEAR AND BY MONTH  ********************** //
+    test("by year counted correctly", async () => {
+      var twentyTwentyTwo = dataController.countAvaregesAndPositives(data4byYear, tp4, sl4).sums.map(toGbp)[1]
+
+      var profitsToTest = 
+        Number(
+          com.arrSum(
+            data4profits
+              .filter(val => com.dateToYear(val.date) == "2022")
+              .map(val => toGbp(val.takenProfit))
+          ).toFixed(2)
+        )
+
+        expect(twentyTwentyTwo).toBe(profitsToTest)
+        expect(twentyTwentyTwo).toBe(180.85)
+      })
+
+    test("by month counted correctly", async () => {
+      // 17 is 12 month 2021 plus June
+      var twentyTwentyTwoJune = dataController.countAvaregesAndPositives(data4byYear, tp4, sl4).monthlyProfits.map(toGbp)[17]
+
+      var profitsToTest = 
+        Number(
+          com.arrSum(
+            data4profits
+              .filter(val => com.dateToMonth(val.date) == "06" && com.dateToYear(val.date) == "2022")
+              .map(val => toGbp(val.takenProfit))
+          ).toFixed(2)
+        )
+
+        expect(profitsToTest).toBe(-62.5)
+        expect(profitsToTest).toBe(twentyTwentyTwoJune)
+      })
+
     // GENERAL CHANGES  ********************** //
     test("monthly or yearly totals changed in 2021 - 2023", async () => {
-
-      var yearlyResult = dataController.countAvaregesAndPositives(data4, tp4, sl4).sums.map(toGbp)
-      var monthlyResult = dataController.countAvaregesAndPositives(data4, tp4, sl4).monthlyProfits.map(toGbp)
+      var yearlyResult = dataController.countAvaregesAndPositives(data4byYear, tp4, sl4).sums.map(toGbp)
+      var monthlyResult = dataController.countAvaregesAndPositives(data4byYear, tp4, sl4).monthlyProfits.map(toGbp)
 
       var yearly = [ -1035.39, 180.85, 145.49 ]
 
