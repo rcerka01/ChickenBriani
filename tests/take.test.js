@@ -16,11 +16,18 @@ const response2 = await request(app).get("/GBPCHF/1D/60/2023/2023/" + spread2 + 
 const data2 =response2.body.dataWithProfits.arr
 const currency2 =response2.body.dataWithProfits.currencyData
 
+const tp3 = 100
+const sl3 = -100
+const spread3 = 2.5
+const response3 = await request(app).get("/GBPCHF/1D/60/2023/2023/" + spread3 + "/" + tp3 + "/" + sl3 + "/take").send()
+const data3 =response3.body.dataWithProfits.arr
+const currency3 =response3.body.dataWithProfits.currencyData
+
 
 // quick util
 function toGbp(val) { return Number(com.toGbp(val, currency1).toFixed(2)) }
 
-describe("GET /GBPCHF/1D/60/2023/2023/2.5/34/-30/take", () => {
+describe("GET /GBPCHF/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
   describe("take profit returns", () => {
 
     test("should respond with a json", () => {
@@ -35,11 +42,29 @@ describe("GET /GBPCHF/1D/60/2023/2023/2.5/34/-30/take", () => {
 
     // DIRECTION CHANGE ********************** //
     test("single day, green trade swap to red, no tp or sl", async () => {
-      // todo
+      expect(data3[3].date).toBe("[05/01/2023]")
+      expect(data3[3].direction).toBe("green")
+      expect(data3[3].directionFlag).toBe("green")
+      expect(data3[2].directionFlag).toBe("red")
+      expect(data3[3].isOpen).toBe(true)
+      expect(data3[3].slOrTp).toBe("far")
+      expect(toGbp(data3[3].maxProfit)).toBeLessThan(tp3)
+      expect(toGbp(data3[3].takenProfit)).toBe(63.76)
+      expect(data3[3].lowerDate).toBe(undefined)
+      expect(data3[3].lowerTime).toBe(undefined)    
     })
 
     test("single day, red trade swap to green, no tp or sl", async () => {
-      // todo
+      expect(data3[4].date).toBe("[06/01/2023]")
+      expect(data3[4].direction).toBe("red")
+      expect(data3[4].directionFlag).toBe("red")
+      expect(data3[3].directionFlag).toBe("green")
+      expect(data3[4].isOpen).toBe(true)
+      expect(data3[4].slOrTp).toBe("far")
+      expect(toGbp(data3[4].maxProfit)).toBeLessThan(tp3)
+      expect(toGbp(data3[4].takenProfit)).toBe(-2.94)
+      expect(data3[4].lowerDate).toBe(undefined)
+      expect(data3[4].lowerTime).toBe(undefined) 
     })
 
     // SINGLE TP ********************** //
@@ -122,7 +147,16 @@ describe("GET /GBPCHF/1D/60/2023/2023/2.5/34/-30/take", () => {
 
     // SINGLE SECONDARY SL ********************** //
     test("single day, green trade, with minProfit less than sl, secondary opening", async () => {
-      // todo
+      expect(data2[18].date).toBe("[26/01/2023]")
+      expect(data2[18].direction).toBe("green")
+      expect(data2[17].direction).toBe("")
+      expect(data2[18].directionFlag).toBe("green")
+      expect(data2[18].isOpen).toBe(true)
+      expect(data2[18].slOrTp).toBe("sl")
+      expect(toGbp(data2[18].minProfit - data1[18].dailyProfit)).toBeLessThan(sl2)
+      expect(toGbp(data2[18].takenProfit)).toBe(sl2- spread2)
+      expect(data2[18].lowerDate).toBe("[27/01/2023]")
+      expect(data2[18].lowerTime).toBe("[08:00:00]")    
     })
 
     test("single day, red trade, with minProfit less than sl, secondary opening", async () => {
@@ -204,6 +238,8 @@ describe("GET /GBPCHF/1D/60/2023/2023/2.5/34/-30/take", () => {
     test("multiple day, red trade, with minProfit less than sl on third time in row", async () => {
       // todo
     })
+
+    //general changes
 
   })
 })
