@@ -1,28 +1,32 @@
 import request from 'supertest'
 import app from '../app.js'
 import com from "../controllers/commonsController.js"
+import dataController from "../controllers/dataController.js"
 
 const tp1 = 34
 const sl1 = -30
 const spread1 = 2.5
 const response1 = await request(app).get("/GBPCHF/1D/60/2023/2023/" + spread1 + "/" + tp1 + "/" + sl1 + "/take").send()
 const data1 =response1.body.dataWithProfits.arr
-const currency1 =response1.body.dataWithProfits.currencyData
+const currency1 = response1.body.dataWithProfits.currencyData
 
 const tp2 = 34
 const sl2 = -10
 const spread2 = 2.5
 const response2 = await request(app).get("/GBPCHF/1D/60/2023/2023/" + spread2 + "/" + tp2 + "/" + sl2 + "/take").send()
-const data2 =response2.body.dataWithProfits.arr
-const currency2 =response2.body.dataWithProfits.currencyData
+const data2 = response2.body.dataWithProfits.arr
 
 const tp3 = 100
 const sl3 = -100
 const spread3 = 2.5
 const response3 = await request(app).get("/GBPCHF/1D/60/2023/2023/" + spread3 + "/" + tp3 + "/" + sl3 + "/take").send()
-const data3 =response3.body.dataWithProfits.arr
-const currency3 =response3.body.dataWithProfits.currencyData
+const data3 = response3.body.dataWithProfits.arr
 
+const tp4 = 30
+const sl4 = -30
+const spread4 = 2.5
+const response4 = await request(app).get("/GBPCHF/1D/60/2021/2023/" + spread4 + "/" + tp4 + "/" + sl4 + "/take").send()
+const data4 = response4.body.byYear
 
 // quick util
 function toGbp(val) { return Number(com.toGbp(val, currency1).toFixed(2)) }
@@ -239,7 +243,23 @@ describe("GET /GBPCHF/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
       // todo
     })
 
-    //general changes
+    // GENERAL CHANGES  ********************** //
+    test("monthly or yearly totals changed in 2021 - 2023", async () => {
+
+      var yearlyResult = dataController.countAvaregesAndPositives(data4, tp4, sl4).sums.map(toGbp)
+      var monthlyResult = dataController.countAvaregesAndPositives(data4, tp4, sl4).monthlyProfits.map(toGbp)
+
+      var yearly = [ -1035.39, 180.85, 145.49 ]
+
+      var monthly = [
+        -90,    -23.75, -2.5, -305.18,  16.94, -90,    -70.02, -127.6,    57.5, -33.29, -182.5, -185, 
+        -32.63, 177.5,  -2.5,   -3.2,   -2.5,  -62.5, -362.5,   143.11,   85,    -2.5,   210,     33.57,  
+         90.49,  55,     0,      0,       0,      0,     0,       0,      0,       0,      0,      0
+      ]
+
+      expect(yearlyResult).toStrictEqual(yearly)
+      expect(monthlyResult).toStrictEqual(monthly)
+    })
 
   })
 })

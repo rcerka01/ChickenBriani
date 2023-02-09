@@ -15,7 +15,7 @@ function dateToYear(date) {
 }
 
 function dateToMonth(date) {
-    return date.split("/")[0].substring(1)
+    return date.split("/")[1]
 }
 
 function getWeekdayFromUnixTimestamp(unixTimestamp, addDays) {
