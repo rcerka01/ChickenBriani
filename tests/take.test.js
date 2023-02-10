@@ -5,34 +5,48 @@ import dataController from "../controllers/dataController.js"
 
 const tp1 = 34
 const sl1 = -30
+const pair1 = "GBPCHF"
 const spread1 = 2.5
-const response1 = await request(app).get("/GBPCHF/1D/60/2023/2023/" + spread1 + "/" + tp1 + "/" + sl1 + "/take").send()
+const response1 = await request(app).get("/" + pair1 + "/1D/60/2023/2023/" + spread1 + "/" + tp1 + "/" + sl1 + "/take").send()
 const data1 =response1.body.dataWithProfits.arr
 const currency1 = response1.body.dataWithProfits.currencyData
 
 const tp2 = 34
 const sl2 = -10
+const pair2 = "GBPCHF"
 const spread2 = 2.5
-const response2 = await request(app).get("/GBPCHF/1D/60/2023/2023/" + spread2 + "/" + tp2 + "/" + sl2 + "/take").send()
+const response2 = await request(app).get("/" + pair2 + "/1D/60/2023/2023/" + spread2 + "/" + tp2 + "/" + sl2 + "/take").send()
 const data2 = response2.body.dataWithProfits.arr
 
 const tp3 = 100
 const sl3 = -100
+const pair3 = "GBPCHF"
 const spread3 = 2.5
-const response3 = await request(app).get("/GBPCHF/1D/60/2023/2023/" + spread3 + "/" + tp3 + "/" + sl3 + "/take").send()
+const response3 = await request(app).get("/" + pair3 + "/1D/60/2023/2023/" + spread3 + "/" + tp3 + "/" + sl3 + "/take").send()
 const data3 = response3.body.dataWithProfits.arr
 
 const tp4 = 30
 const sl4 = -30
+const pair4 = "GBPCHF"
 const spread4 = 2.5
-const response4 = await request(app).get("/GBPCHF/1D/60/2021/2023/" + spread4 + "/" + tp4 + "/" + sl4 + "/take").send()
+const response4 = await request(app).get("/" + pair4 + "/1D/60/2021/2023/" + spread4 + "/" + tp4 + "/" + sl4 + "/take").send()
 const data4byYear = response4.body.byYear
 const data4profits = response4.body.dataWithProfits.arr
 
-// quick util
-function toGbp(val) { return Number(com.toGbp(val, currency1).toFixed(2)) }
+const tp5 = 100
+const sl5 = -100
+const pair5 = "EURUSD"
+const spread5 = 2.5
+const response5 = await request(app).get("/" + pair5 + "/1D/60/2021/2023/" + spread5 + "/" + tp5 + "/" + sl5 + "/take").send()
+const data5 = response5.body.dataWithProfits.arr
+const currency5 = response5.body.dataWithProfits.currencyData
 
-describe("GET /GBPCHF/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
+// quick util GBPCHF
+function toGbp(val) { return Number(com.toGbp(val, currency1).toFixed(2)) }
+// quick util EURUSD
+function toGbpE(val) { return Number(com.toGbp(val, currency5).toFixed(2)) }
+
+describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
   describe("take profit returns", () => {
 
     test("should respond with a json", () => {
@@ -230,16 +244,53 @@ describe("GET /GBPCHF/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
 
     // MULTIPLE SEQUENCED TP  ********************** //
     test("multiple day, green trade, with maxProfit greater than tp on third time in row", async () => {
-      // todo
+      expect(data5[88].date).toBe("[06/05/2021]")
+      expect(data5[88].direction).toBe("")
+      expect(data5[88].directionFlag).toBe("green")
+      expect(data5[88].isOpen).toBe(true)
+      expect(data5[88].slOrTp).toBe("tp")
+
+      expect(toGbpE(data5[87].takenProfit)).toBe(0)
+
+      expect(data5[89].isOpen).toBe(false)
+      expect(data5[89].takenProfit).toBe(0)
+
+      expect(toGbpE(data5[88].maxProfit - data5[74].dailyProfit)).toBeGreaterThan(tp5)
+      expect(toGbpE(data5[88].takenProfit)).toBe(97.50)   
+      expect(toGbpE(data5[88].takenProfit)).toBe(tp5 - spread5)
+      
+
+      expect(data5[88].lowerDate).toBe("[07/05/2021]")
+      expect(data5[88].lowerTime).toBe("[16:00:00]")  
     })
+
     test("multiple day, red trade, with maxProfit greater than tp on third time in row", async () => {
       // todo
     })
 
     // MULTIPLE SEQUENCED SL  ********************** //
-    test("multiple day, green trade, with minProfit less than sl on third time in row", async () => {
-      // todo
+    test("multiple day, green trade, with minProfit less than sl on forth time in row", async () => {
+      expect(data5[116].date).toBe("[15/06/2021]")
+      expect(data5[116].direction).toBe("")
+      expect(data5[116].directionFlag).toBe("green")
+      expect(data5[116].isOpen).toBe(true)
+      expect(data5[116].slOrTp).toBe("sl")
+
+      expect(toGbpE(data5[115].takenProfit)).toBe(0)
+
+      expect(data5[117].isOpen).toBe(false)
+      expect(data5[117].takenProfit).toBe(0)
+
+      expect(toGbpE(data5[116].minProfit - data5[94].dailyProfit)).toBeLessThan(sl5)
+      expect(toGbpE(data5[116].takenProfit)).toBe(-102.50)   
+      expect(toGbpE(data5[116].takenProfit)).toBe(sl5 - spread5)
+  116
+      expect(toGbpE(data5[117].takenProfit)).toBe(0)
+
+      expect(data5[116].lowerDate).toBe("[16/06/2021]")
+      expect(data5[116].lowerTime).toBe("[19:00:00]") 
     })
+
     test("multiple day, red trade, with minProfit less than sl on third time in row", async () => {
       // todo
     })

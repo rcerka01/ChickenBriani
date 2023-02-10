@@ -158,7 +158,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
     // todo move up at beggining
     function toGbp(val) { return com.toGbp(val, currency).toFixed(2) }
     function toPip(val) { return com.convertToPips(val, currency).toFixed(1) }
-    function toTest(val) { return "<strong>" + toPip(val) + "</strong>(" + toGbp(val) + ")" }
+    function toTest(val) { return toPip(val) + "<strong>(" + toGbp(val) + ")</strong>" }
 
     // quick util function
     function gbp(val) { return com.toGbp(val, currency).toFixed(2) }
@@ -278,7 +278,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                                 if (val.directionFlag == "green") {
                                     test = date + " " + time + 
                                         "green: " + toTest(highDiff) + 
-                                        " = h:  " + Number(high).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
+                                        " = (h:  " + Number(high).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + ") " + toTest(Number(Number(high).toFixed(5)) - Number(Number(val.currentClose).toFixed(5))) +
                                         " + pp: " + toTest(previousProfit) +
                                         " - ss: " + toTest(secondaryOpenSubtractor)
 
@@ -286,7 +286,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                                 } else if (val.directionFlag == "red") {
                                     test = date + " " + time + 
                                         " red: "  + toTest(highDiff) + 
-                                        " = c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(low).toFixed(5) + 
+                                        " = (c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(low).toFixed(5) + ") " + toTest(Number(Number(val.currentClose).toFixed(5)) - Number(Number(low).toFixed(5))) +
                                         " + pp: " + toTest(previousProfit) +
                                         " - ss: " + toTest(secondaryOpenSubtractor)
                                 }
@@ -311,14 +311,14 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                                 if (val.directionFlag == "green") {
                                     test = date + " " + time + 
                                         "green: " + toTest(lowDiff) + 
-                                        " = h: "  + Number(low).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + 
+                                        " = (h: "  + Number(low).toFixed(5) + " - c: " + Number(val.currentClose).toFixed(5) + ") " + toTest(Number(Number(low).toFixed(5)) - Number(Number(val.currentClose).toFixed(5))) +
                                         " + pp: " + toTest(previousProfit) +
                                         " - ss: " + toTest(secondaryOpenSubtractor)
 
                                 } else if (val.directionFlag == "red") {
                                     test = date + " " + time + 
                                         " red: "  + toTest(lowDiff) + 
-                                        " = c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(high).toFixed(5) + 
+                                        " = (c: "  + Number(val.currentClose).toFixed(5) + " - l: " + Number(high).toFixed(5) + ") " + toTest(Number(Number(val.currentClose).toFixed(5)) - Number(Number(high).toFixed(5)))
                                         " + pp: " + toTest(previousProfit) +
                                         " - ss: " + toTest(secondaryOpenSubtractor)
                                 }
