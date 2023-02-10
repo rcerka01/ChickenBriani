@@ -244,7 +244,14 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
             var prevDayItem = resultsArr[resultsArr.length - 1]
             // if prev day was open and profit was not taken
             if (resultsArr.length > 0 && prevDayItem.takenProfit == 0) var previousProfit = prevDayItem.dailyProfit
-            else var previousProfit = 0
+            else {
+                if (resultsArr.length > 0 && prevDayItem.isOpen && prevDayItem.directionFlag == val.directionFlag) { 
+                    var previousProfit = prevDayItem.dailyProfit 
+                }
+                else { 
+                    var previousProfit = 0 
+                }
+            }
 
             // loop  to find tp or sl in lower step data
             if (forTheDayArr !== undefined) {

@@ -284,7 +284,7 @@ describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
       expect(toGbpE(data5[116].minProfit - data5[94].dailyProfit)).toBeLessThan(sl5)
       expect(toGbpE(data5[116].takenProfit)).toBe(-102.50)   
       expect(toGbpE(data5[116].takenProfit)).toBe(sl5 - spread5)
-  116
+  
       expect(toGbpE(data5[117].takenProfit)).toBe(0)
 
       expect(data5[116].lowerDate).toBe("[16/06/2021]")
@@ -309,7 +309,7 @@ describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
         )
 
         expect(twentyTwentyTwo).toBe(profitsToTest)
-        expect(twentyTwentyTwo).toBe(180.85)
+      //  expect(twentyTwentyTwo).toBe(180.85)
       })
 
     test("by month counted correctly", async () => {
@@ -334,16 +334,32 @@ describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
       var yearlyResult = dataController.countAvaregesAndPositives(data4byYear, tp4, sl4).sums.map(toGbp)
       var monthlyResult = dataController.countAvaregesAndPositives(data4byYear, tp4, sl4).monthlyProfits.map(toGbp)
 
-      var yearly = [ -1035.39, 180.85, 145.49 ]
+      var yearly = [ -1035.39, 222.20, 145.49 ]
 
       var monthly = [
         -90,    -23.75, -2.5, -305.18,  16.94, -90,    -70.02, -127.6,    57.5, -33.29, -182.5, -185, 
-        -32.63, 177.5,  -2.5,   -3.2,   -2.5,  -62.5, -362.5,   143.11,   85,    -2.5,   210,     33.57,  
+        -32.63, 218.85,  -2.5,   -3.2,   -2.5,  -62.5, -362.5,   143.11,   85,    -2.5,   210,     33.57,  
          90.49,  55,     0,      0,       0,      0,     0,       0,      0,       0,      0,      0
       ]
 
       expect(yearlyResult).toStrictEqual(yearly)
       expect(monthlyResult).toStrictEqual(monthly)
+    })
+
+    // TESTS FROM SUSPICIOUS BEHAVIOR ********************** //
+    test("previos profit must be preserved on sequential green opening when previous green not close", async () => {
+      const response = await request(app).get("/EURUSD/1D/60/2021/2023/2.5/109/-15/take").send()
+      const data = response.body.dataWithProfits.arr
+
+      expect(data[20].date).toBe("[01/02/2021]")
+      expect(data[20].direction).toBe("green")
+      expect(data[20].directionFlag).toBe("green")
+      expect(data[20].isOpen).toBe(true)
+      expect(data[21].isOpen).toBe(false)
+      expect(data[20].slOrTp).toBe("sl")
+      expect(toGbpE(data[20].takenProfit)).toBe(-17.50)
+      expect(data[20].lowerDate).toBe("[02/02/2021]")
+      expect(data[20].lowerTime).toBe("[10:00:00]")
     })
 
   })
