@@ -3,8 +3,9 @@ import dataController from "./dataController.js"
 import outputController from "./outputController.js"
 import com from "./commonsController.js"
 
-async function getData(currency, step, yearFrom, yearTo, isSimple) { 
-  var path = conf.fileName.path + conf.fileName.prefix + currency + conf.fileName.join + step + ".csv"
+async function getData(postfix, currency, step, yearFrom, yearTo, isSimple) { 
+  if (postfix !== undefined) var tail = postfix; else var tail = ""
+  var path = conf.fileName.path + conf.fileName.prefix + currency + conf.fileName.join + step + tail + ".csv"
   var currencyData = conf.mapper.find(c => c.name == currency)
   var items = await dataController.readFile(path, yearFrom, yearTo, isSimple)
   return { days: items.days, currencyData }
@@ -33,19 +34,20 @@ export default { run: function (app) {
       toOutput(res, html, {})
     });
 
-  app.get("/:currency/:step/:yearfrom/:yearto/raw", async function(req, res) {
+  app.get("/:currency/:step/:yearfrom/:yearto/raw/:postfix?", async function(req, res) {
       var currency = req.params.currency;
       var step     = req.params.step;
       var yearFrom = req.params.yearfrom;
       var yearTo   = req.params.yearto;
+      var postfix   = req.params.postfix;
 
-      var data = await getData(currency, step, yearFrom, yearTo)
+      var data = await getData(postfix, currency, step, yearFrom, yearTo)
       var html = outputController.rawOutput(data)
 
       toOutput(res, html, data)
   });
 
-  app.get("/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tp/:sl/take", async function(req, res) {
+  app.get("/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tp/:sl/take/:postfix?", async function(req, res) {
     var currency  = req.params.currency;
     var step      = req.params.step;
     var lowerStep = req.params.lowerstep;
@@ -54,12 +56,13 @@ export default { run: function (app) {
     var spread    = Number(req.params.spread);
     var tp        = Number(req.params.tp);
     var sl        = Number(req.params.sl);
+    var postfix   = req.params.postfix;
 
     var currencyData = conf.mapper.find(c => c.name == currency)
     // uses readLine
-    var data =      await getData(currency, step,      yearFrom, yearTo)
+    var data =      await getData(postfix, currency, step,      yearFrom, yearTo)
     // uses readLineSmple
-    var lowerData = await getData(currency, lowerStep, yearFrom, yearTo, true)
+    var lowerData = await getData(postfix, currency, lowerStep, yearFrom, yearTo, true)
 
     var dataWithProfits = dataController.takeProfits(data, lowerData, lowerStep, spread, tp, sl)
     var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)
@@ -72,7 +75,7 @@ export default { run: function (app) {
     toOutput(res, html, { dataWithProfits, byYear })
   })
 
-  app.get("/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple", async function(req, res) {
+  app.get("/:currency/:step/:lowerstep/:yearfrom/:yearto/:spread/:tpfrom/:tptill/:tpstep/:slfrom/:sltill/:slstep/multiple/:postfix?", async function(req, res) {
     var currency  = req.params.currency;
     var step      = req.params.step;
     var lowerStep = req.params.lowerstep;
@@ -85,12 +88,13 @@ export default { run: function (app) {
     var slfrom    = Number(req.params.slfrom);
     var sltill    = Number(req.params.sltill);
     var slstep    = Number(req.params.slstep);
+    var postfix   = req.params.postfix;
 
     var currencyData = conf.mapper.find(c => c.name == currency)
     // uses readLine
-    var data =      await getData(currency, step,      yearFrom, yearTo)
+    var data =      await getData(postfix, currency, step,      yearFrom, yearTo)
     // uses readLineSmple
-    var lowerData = await getData(currency, lowerStep, yearFrom, yearTo, true)
+    var lowerData = await getData(postfix, currency, lowerStep, yearFrom, yearTo, true)
 
     var outputs = []
     var html  = ""

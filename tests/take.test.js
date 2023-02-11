@@ -348,6 +348,7 @@ describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
 
     // TESTS FROM SUSPICIOUS BEHAVIOR ********************** //
     test("previos profit must be preserved on sequential green opening when previous green not close", async () => {
+      // id = 001
       const response = await request(app).get("/EURUSD/1D/60/2021/2023/2.5/109/-15/take").send()
       const data = response.body.dataWithProfits.arr
 
@@ -360,6 +361,25 @@ describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
       expect(toGbpE(data[20].takenProfit)).toBe(-17.50)
       expect(data[20].lowerDate).toBe("[02/02/2021]")
       expect(data[20].lowerTime).toBe("[10:00:00]")
+    })
+
+    test("previos profit must be zero if previous trade is close and from different direction", async () => {
+      // id = 002
+      const response = await request(app).get("/EURUSD/1D/240/2016/2023/1/76/-225/take/-002").send()
+      const data = response.body.dataWithProfits.arr
+
+      expect(data[24].date).toBe("[05/02/2016]")
+
+      expect(data[23].directionFlag).toBe("green")
+      expect(data[23].isOpen).toBe(false)
+
+      expect(data[24].direction).toBe("red")
+      expect(data[24].directionFlag).toBe("red")
+      expect(data[24].isOpen).toBe(true)
+
+      expect(data[24].slOrTp).toBe("far")
+      expect(toGbpE(data[24].takenProfit)).toBe(-33.48) // minus spread
+      expect(toGbpE(data[24].dailyProfit)).toBe(-32.48)
     })
 
   })

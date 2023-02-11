@@ -252,8 +252,11 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                     var previousProfit = 0 
                 }
             }
+            if (resultsArr.length > 0 && !prevDayItem.isOpen && prevDayItem.directionFlag != val.directionFlag) { 
+                var previousProfit = 0 
+            }
 
-            // loop  to find tp or sl in lower step data
+            // loop  to find tp or sl in lower step datas
             if (forTheDayArr !== undefined) {
                 for (var ii = 0; ii < forTheDayArr.length; ii++) {
                     if (forTheDayArr[ii] !== void 0 && i > 0) {
