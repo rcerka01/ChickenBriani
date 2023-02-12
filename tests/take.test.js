@@ -334,12 +334,12 @@ describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
       var yearlyResult = dataController.countAvaregesAndPositives(data4byYear, tp4, sl4).sums.map(toGbp)
       var monthlyResult = dataController.countAvaregesAndPositives(data4byYear, tp4, sl4).monthlyProfits.map(toGbp)
 
-      var yearly = [ -1035.39, 222.20, 145.49 ]
+      var yearly = [ -1035.39, 222.20, 205.49 ]
 
       var monthly = [
         -90,    -23.75, -2.5, -305.18,  16.94, -90,    -70.02, -127.6,    57.5, -33.29, -182.5, -185, 
         -32.63, 218.85,  -2.5,   -3.2,   -2.5,  -62.5, -362.5,   143.11,   85,    -2.5,   210,     33.57,  
-         90.49,  55,     0,      0,       0,      0,     0,       0,      0,       0,      0,      0
+        150.49,  55,     0,      0,       0,      0,     0,       0,      0,       0,      0,      0
       ]
 
       expect(yearlyResult).toStrictEqual(yearly)
@@ -347,6 +347,7 @@ describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
     })
 
     // TESTS FROM SUSPICIOUS BEHAVIOR ********************** //
+
     test("previos profit must be preserved on sequential green opening when previous green not close", async () => {
       // id = 001
       const response = await request(app).get("/EURUSD/1D/60/2021/2023/2.5/109/-15/take").send()
@@ -380,6 +381,20 @@ describe("GET /{pair}/1D/60/2023/2023/2.5/{tp}/{sl}/take", () => {
       expect(data[24].slOrTp).toBe("far")
       expect(toGbpE(data[24].takenProfit)).toBe(-33.48) // minus spread
       expect(toGbpE(data[24].dailyProfit)).toBe(-32.48)
+    })
+
+    test("lower time data must correctly work on summertime, eg. March split at 21:00", async () => {
+      // id = 003
+      const response = await request(app).get("/EURUSD/1D/240/2016/2023/1/76/-225/take/-003").send()
+      const data = response.body.dataWithProfits.arr
+
+      expect(data[50].date).toBe("[14/03/2016]")
+      expect(data[50].isOpen).toBe(true)
+      expect(data[50].slOrTp).toBe("far")
+
+      expect(data[51].slOrTp).toBe("tp")
+      expect(toGbpE(data[51].takenProfit)).toBe(75)
+      expect(toGbpE(data[51].dailyProfit)).toBe(101.66)
     })
 
   })

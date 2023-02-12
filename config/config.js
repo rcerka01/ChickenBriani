@@ -15,22 +15,27 @@ export default {
     },
 
     lowerTimeSplitKey: "[22:00:00]",
+    secondaryLowerTimeSplitKey: "[21:00:00]",
 
     lowerTimeSteps: [
         { 
             step: 60,
             position: 3,
-            key: "[02:00:00]"
+            key: "[02:00:00]",
+            secondaryKey: "[01:00:00]"
         },
         {
             step: 120,
             position: 1,
-            key: "[02:00:00]"
+            key: "[02:00:00]",
+            secondaryKey: "[01:00:00]"
+            
         },
         {
             step: 240,
             position: 0,
-            key: "[02:00:00]"
+            key: "[02:00:00]",
+            secondaryKey: "[01:00:00]"
         }
 
     ],

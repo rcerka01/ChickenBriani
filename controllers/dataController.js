@@ -185,7 +185,9 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
         var subArr = []
         arr.forEach( val => {
             subArr.push(val)
-            if (val.time == conf.lowerTimeSplitKey) { result.push(subArr); subArr = [] }
+            if (val.time == conf.lowerTimeSplitKey) { result.push(subArr); subArr = []; return }
+            // summertime
+            if (val.time == conf.secondaryLowerTimeSplitKey) { result.push(subArr); subArr = []; return }
         })
         return result
     }
@@ -194,7 +196,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
     var lowerDaysSplit = splitIntoDays(lowerDays)
      
     //
-    // loop begins
+    // --- loop begins ---
     //
     days.forEach( (val, i) => {
         test = ""
@@ -222,7 +224,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
         takenProfit = 0 
        
         //
-        // join with data from lower time step
+        // --- join with data from lower time step ---
         //
 
         // is sl or tp happen first, or day is closed
@@ -231,13 +233,17 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
         // look for tp or sl only if day is open
         if (isOpen) {
 
-            // find key parameters to korrectly split lower data array
+            // find key parameters to correctly split lower data array
             var keyParam = conf.lowerTimeSteps.find(p => p.step == lowerStep)
 
             // find lower data for the day
             var forTheDayArr = []
             if (i + 1 < days.length) {
-                forTheDayArr = lowerDaysSplit.find(ld => ld[keyParam.position] !== void 0 && ld[keyParam.position].time == keyParam.key && ld[3].date == days[i + 1].date)
+                forTheDayArr = lowerDaysSplit.find(ld => ld[keyParam.position] !== void 0 && ld[keyParam.position].time == keyParam.key && ld[keyParam.position].date == days[i + 1].date)
+                // for summertime
+                if (forTheDayArr === void 0) {
+                    forTheDayArr = lowerDaysSplit.find(ld => ld[keyParam.position] !== void 0 && ld[keyParam.position].time == keyParam.secondaryKey && ld[keyParam.position].date == days[i + 1].date)
+                }
             }
 
             // if previous trade is open, but tp or sl is not riched. Get as last item of now generated results array
@@ -354,7 +360,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
         }
 
         // 
-        // take profit on dirction change
+        // --- btake profit on dirction change ---
         //
         if (isOpen && i + 1 < days.length && days[i + 1].directionFlag != val.directionFlag && val.directionFlag.length > 0) {
             if ( ! closeNext) {
