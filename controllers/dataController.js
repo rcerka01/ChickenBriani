@@ -430,17 +430,35 @@ function profitsByYear(arr, from, to) {
  * Public
  */
 function countMaxNegativeSequence(arr) {
-    var result = 0
+    var lowest = 0
     var temp = 0
+    var date = ""
+    var tArr = []
+    var counter = 0
+
     arr.forEach( val => {
-        if (val < 0 ) temp = temp + val
-        else if (val > 0) { 
-            if (result > temp) result = temp
+        var tPr = val.takenProfit
+        if (tPr < 0 ) { 
+            temp = temp + tPr
+            counter = counter + 1
+        }
+        else if (tPr > 0) { 
+            if (lowest > temp) { 
+                lowest = temp; 
+                date = val.date; 
+                tArr[counter] = 1
+            } else {
+                if (tArr[counter] === undefined) tArr[counter] = 1
+                else tArr[counter] = tArr[counter] + 1
+            }
             temp = 0
+            counter = 0
          }
     })
-    return result
+
+    return { lowest, date, tArr }
 }
+
 
 /*
  * Public
