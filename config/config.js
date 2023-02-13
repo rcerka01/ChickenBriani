@@ -44,5 +44,9 @@ export default {
         enabled: true
     },
 
+    extendedInfo: {
+        enabled: false
+    },
+
     mapper: currencies.mapper,
 }

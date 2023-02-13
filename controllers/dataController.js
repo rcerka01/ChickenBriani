@@ -432,7 +432,8 @@ function profitsByYear(arr, from, to) {
 function countMaxNegativeSequence(arr) {
     var lowest = 0
     var temp = 0
-    var date = ""
+    var date = []
+    var dateTemp = []
     var tArr = []
     var counter = 0
 
@@ -441,11 +442,12 @@ function countMaxNegativeSequence(arr) {
         if (tPr < 0 ) { 
             temp = temp + tPr
             counter = counter + 1
+            dateTemp.push(val.date)
         }
         else if (tPr > 0) { 
             if (lowest > temp) { 
-                lowest = temp; 
-                date = val.date; 
+                lowest = temp 
+                date = dateTemp
                 tArr[counter] = 1
             } else {
                 if (tArr[counter] === undefined) tArr[counter] = 1
@@ -453,6 +455,7 @@ function countMaxNegativeSequence(arr) {
             }
             temp = 0
             counter = 0
+            dateTemp = []
          }
     })
 
