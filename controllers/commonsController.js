@@ -37,13 +37,17 @@ function gbpToChartValue(currency, gbp) {
     return gbp / currency.pipToGBP / currency.value / currency.lot
 }
 
-// used in outputProfitsByYear
+// used in outputProfitsByYear. converting chart value
 function convertToPips(val, currency) {
     return val / currency.pip
 }
 
 function toGbp(val, currency) {
     return convertToPips(val, currency) * getOnePipValueGbp(currency)
+}
+
+function GbpToPip(val, currency) {
+    return val / getOnePipValueGbp(currency)
 }
 
 // used in profitsByYear
@@ -64,5 +68,6 @@ export default {
     getOnePipValueGbp,
     convertDateFromUnixTimestamp,
     convertTimeFromUnixTimestamp,
-    toGbp
+    toGbp,
+    GbpToPip
 }

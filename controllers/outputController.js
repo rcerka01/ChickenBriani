@@ -1,4 +1,5 @@
 import com from "./commonsController.js"
+import dataController from "./dataController.js"
 
 /*
  * Inner. Used in rawOutput and outputProfitsByYear
@@ -211,22 +212,35 @@ function outputAvaragesAndPositives(val, currency) {
     var output = "<h4 style='color:brown;'>" + createTitle(currency) + "</h4>"
     output = output + "<table>"
 
+    var period = (val.total / 12).toFixed(0) + " years, " + (val.total % 12).toFixed(0) + " month (" + val.total + " total month)"
     var lowest = com.toGbp(Math.min.apply(Math, val.arrCountMinProfit.map(val => Number(val.minProfit))), currency).toFixed(2)
+    var maxNeg = com.toGbp(dataController.countMaxNegativeSequence(val.arrCountMinProfit.map(val => Number(val.takenProfit))), currency).toFixed(2)
     var positivesPercent = (val.positives / val.total * 100).toFixed() 
-    var total = (com.convertToPips(com.arrSum(val.sums), currency) * onePipvalue).toFixed(2)  
+    var total = (com.convertToPips(com.arrSum(val.sums), currency) * onePipvalue)
+    var margin = com.getMarginGbp(currency)
+    var totalPercents = 100 * total / margin
+    var totalWithRiskPercents = 100 * total / (margin - Number(maxNeg)) // minus minus
+    var totalWIthRiskPercentsFull = totalWithRiskPercents.toFixed(2) + "%, anual: " + (totalWithRiskPercents / val.total * 12).toFixed(2) + "%, monthly: " + (totalWithRiskPercents / val.total).toFixed(2) + "%"
+    var totalPercentsFull = totalPercents.toFixed(2) + "%, anual: " + (totalPercents / val.total * 12).toFixed(2) + "%, monthly: " + (totalPercents / val.total).toFixed(2) + "%"
     var yearlyRow = val.sums.map(val => " " + (com.convertToPips(val, currency) * onePipvalue).toFixed(2))   
     var monthlyRow = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
     
     var output = 
         "<table>" +
-            "<tr><td><strong>TP:</strong></td><td>" + val.tp + "</td>" +
-                "<td><strong>Sl:</strong></td><td>" + val.sl + "</td></tr>" +
-            "<tr><td><strong>Total:</strong></td><td>" + val.total + "</td>" +
-                "<td><strong>Positives:</strong></td><td>" + val.positives + " (" + positivesPercent + "%)</td></tr>" +
-        "</table>" +
-        
-        "<strong>Total for the priod: </strong><span style='color:red;'>" + total + "</span><br>" +
-        "<strong>Lowest possible value (min GBP): </strong><span style='color:red;'>" + lowest + "</span><br>" +
+            "<tr><td><strong>TP: </strong></td><td>" + val.tp.toFixed(2) + " (" + com.GbpToPip(val.tp, currency).toFixed(2) + ")</td></tr>" +
+            "<tr><td><strong>Sl: </strong></td><td>" + val.sl.toFixed(2) + " (" + com.GbpToPip(val.sl, currency).toFixed(2) + ")</td></tr>" +
+            "<tr><td><strong>Period: </strong></td><td>" + period + "</td></tr>" +
+            "<tr><td><strong>Positives: </strong></td><td>" + val.positives + " (" + positivesPercent + "%)</td></tr>" +
+            "<tr><td><strong>Lowest possible: </strong></td><td>" + lowest + "</td></tr>" +
+
+            "<tr><td><strong>Total gain: </strong></td><td><span style='color:red;'>" + total.toFixed(2) + "</span></td></tr>" +
+            "<tr><td><strong>Total gain %: </strong></td><td><span style='color:red;'>" + totalPercentsFull + "</span></td></tr>" +
+            "<tr><td><strong>Margin: </strong></td><td>" + margin.toFixed(2) + "</td></tr>" +
+            "<tr><td><strong>Lowest sequential: </strong></td><td>" + maxNeg + "</td></tr>" +
+            "<tr><td><strong>Total min locked: </strong></td><td><span style='color:red;'>" + (margin - maxNeg).toFixed(2) + "</span></td></tr>" +
+            "<tr><td><strong>Total % with risk: </strong></td><td><span style='color:red;'>" + totalWIthRiskPercentsFull + "</span></td></tr>" +
+        "</table>" +    
+
         "<strong>Yearly profits: </strong><br>" + yearlyRow + "<br>" +
         "<strong>Monthly profits, descending: </strong><br>" + monthlyRow + "<br><br>"
 
