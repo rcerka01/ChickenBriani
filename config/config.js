@@ -41,11 +41,11 @@ export default {
     ],
 
     tests: {
-        enabled: true
+        enabled: false
     },
 
     extendedInfo: {
-        enabled: false
+        enabled: true
     },
 
     mapper: currencies.mapper,

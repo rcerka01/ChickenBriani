@@ -209,7 +209,7 @@ function outputProfitsByYear(arr, tp, sl, currency) {
 /*
  *
  */
-function outputAvaragesAndPositives(val, currency) {
+function outputAvaragesAndPositives(val, spread, currency) {
     var onePipvalue = com.getOnePipValueGbp(currency)
 
     var output = "<h4 style='color:brown;'>" + createTitle(currency) + "</h4>"
@@ -224,7 +224,7 @@ function outputAvaragesAndPositives(val, currency) {
     if (conf.extendedInfo.enabled) {
         var maxNeg = dataController.countMaxNegativeSequence(val.arrCountMinProfit.map(val => ({ takenProfit: Number(val.takenProfit), date: val.date }) ))
         var seqNegOut = maxNeg.tArr.map( (val, i) => " " + i + "x-" + val + "x")
-        var maxNegOut = "<span style='color:red;'>" +com.toGbp(maxNeg.lowest, currency).toFixed(2) + "</span> " + maxNeg.date + " " + seqNegOut
+        var maxNegOut = "<span style='color:red;'>" +com.toGbp(maxNeg.lowest, currency).toFixed(2) + "</span> " + maxNeg.date[0] + " " + seqNegOut
         var lowest = com.toGbp(Math.min.apply(Math, val.arrCountMinProfit.map(val => Number(val.minProfit))), currency).toFixed(2)  
         var totalPercents = 100 * total / margin
         var maxNegGbp = com.toGbp(maxNeg.lowest, currency)
@@ -247,13 +247,13 @@ function outputAvaragesAndPositives(val, currency) {
 
     var output = 
         "<table>" +
-            "<tr><td><strong>TP: </strong></td><td>" + val.tp.toFixed(2) + " (" + com.GbpToPip(val.tp, currency).toFixed(2) + ")</td></tr>" +
-            "<tr><td><strong>Sl: </strong></td><td>" + val.sl.toFixed(2) + " (" + com.GbpToPip(val.sl, currency).toFixed(2) + ")</td></tr>" +
+            "<tr><td><strong>TP: </strong></td><td>" + val.tp.toFixed(2) + " (" + com.GbpToPip(val.tp, currency).toFixed(2) + "), with spread: " + (val.tp + spread).toFixed(2) + " (" + com.GbpToPip((val.tp + spread), currency).toFixed(2) + ")</td></tr>" +
+            "<tr><td><strong>Sl: </strong></td><td>" + val.sl.toFixed(2) + " (" + com.GbpToPip(val.sl, currency).toFixed(2) + "), with spread: " + (val.sl - spread).toFixed(2) + " (" + com.GbpToPip((val.sl - spread), currency).toFixed(2) + ")</td></tr>" +
             "<tr><td><strong>Period: </strong></td><td>" + period + "</td></tr>" +
             "<tr><td><strong>Positives: </strong></td><td>" + val.positives + " (<span style='color:red;'>" + positivesPercent + "%</span>)</td></tr>" +
             "<tr><td><strong>Lowest possible: </strong></td><td>" + lowest + "</td></tr>" +
 
-            "<tr><td><strong>Total gain: </strong></td><td><span style='color:red;'>" + total.toFixed(2) + "</span></td></tr>" +
+            "<tr><td><strong>Total gain: </strong></td><td><span style='color:red;font-weight:bold;'>" + total.toFixed(2) + "</span></td></tr>" +
             "<tr><td><strong>Total gain %: </strong></td><td><span style='color:red;'>" + totalPercentsFull + "</span></td></tr>" +
             "<tr><td><strong>Margin: </strong></td><td><span style='color:red;'>" + margin.toFixed(2) + "</span></td></tr>" +
             "<tr><td><strong>Lowest sequential: </strong></td><td>" + maxNegOut + "</td></tr>" +

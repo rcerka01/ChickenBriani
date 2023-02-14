@@ -68,7 +68,7 @@ export default { run: function (app) {
     var byYear = dataController.profitsByYear(dataWithProfits.arr, yearFrom, yearTo)
 
     var html = outputController.outputAvaragesAndPositives(
-        dataController.countAvaregesAndPositives(byYear, tp, sl), currencyData)
+        dataController.countAvaregesAndPositives(byYear, tp, sl), spread, currencyData)
         + outputController.outputProfitsByYear(byYear, tp, sl, currencyData)
         + outputController.outputWithProfits(dataWithProfits)
     
@@ -111,7 +111,7 @@ export default { run: function (app) {
 
     outputs.sort((a,b) => com.arrSum(b.sums) - com.arrSum(a.sums))
 
-    outputs.forEach( item => html = html + outputController.outputAvaragesAndPositives(item, currencyData))
+    outputs.forEach( item => html = html + outputController.outputAvaragesAndPositives(item, spread, currencyData))
 
     toOutput(res, html, {})
   });
