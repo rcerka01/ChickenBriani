@@ -145,7 +145,7 @@ function formLines(dataArray, yearFrom, yearTo) {
 
     return { days }
 }
-
+true
 /*
  * Public
  */

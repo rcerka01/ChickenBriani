@@ -223,7 +223,7 @@ function outputAvaragesAndPositives(val, spread, currency) {
     
     if (conf.extendedInfo.enabled) {
         var maxNeg = dataController.countMaxNegativeSequence(val.arrCountMinProfit.map(val => ({ takenProfit: Number(val.takenProfit), date: val.date }) ))
-        var seqNegOut = maxNeg.tArr.map( (val, i) => " " + i + "x-" + val + "x")
+        var seqNegOut = maxNeg.tArr.map( (val, i) => " " + i + "x-" + val)
         var maxNegOut = "<span style='color:red;'>" +com.toGbp(maxNeg.lowest, currency).toFixed(2) + "</span> " + maxNeg.date[0] + " " + seqNegOut
         var lowest = com.toGbp(Math.min.apply(Math, val.arrCountMinProfit.map(val => Number(val.minProfit))), currency).toFixed(2)  
         var totalPercents = 100 * total / margin
@@ -231,7 +231,7 @@ function outputAvaragesAndPositives(val, spread, currency) {
         var totalWithRiskPercents = 100 * total / (margin - maxNegGbp) // minus minus
         var totalWIthRiskPercentsFull = totalWithRiskPercents.toFixed(2) + "%, anual: " + (totalWithRiskPercents / val.total * 12).toFixed(2) + "%, monthly: " + (totalWithRiskPercents / val.total).toFixed(2) + "%"
         var totalPercentsFull = totalPercents.toFixed(2) + "%, anual: " + (totalPercents / val.total * 12).toFixed(2) + "%, monthly: " + (totalPercents / val.total).toFixed(2) + "%"
-        var monthlyRow = val.monthlyProfits.sort((a, b) => b - a).map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
+        var monthlyRow = val.monthlyProfits.map(val => (com.convertToPips(val, currency) * onePipvalue).toFixed(2))  
     } else {
         var maxNeg
         var seqNegOut 
@@ -262,7 +262,7 @@ function outputAvaragesAndPositives(val, spread, currency) {
         "</table>" +    
 
         "<strong>Yearly profits: </strong><br>" + yearlyRow + "<br>" +
-        "<strong>Monthly profits, descending: </strong><br>" + monthlyRow + "<br><br>"
+        "<strong>Monthly profits: </strong><br>" + monthlyRow + "<br><br>"
 
     return output
 }
