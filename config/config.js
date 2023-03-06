@@ -1,7 +1,11 @@
-import currencies from "./currencies.js"
-
-if (process.env.NODE_ENV === "test") var envConf = await import('./config.test.js')
-else var envConf = await import('./config.prod.js')
+if (process.env.NODE_ENV === "test") {
+    var envConf = await import('./config.test.js')
+    var envCurrencies = await import('./currencies.test.js')
+}
+else {
+    var envConf = await import('./config.prod.js')
+    var envCurrencies = await import('./currencies.prod.js')
+}
 
 export default {
     app: {
@@ -41,12 +45,12 @@ export default {
     ],
 
     tests: {
-        enabled: false
+        enabled: true
     },
 
     extendedInfo: {
         enabled: true
     },
 
-    mapper: currencies.mapper,
+    mapper: envCurrencies.default.mapper,
 }
