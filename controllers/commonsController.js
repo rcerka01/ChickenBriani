@@ -1,13 +1,28 @@
+import conf from "../config/config.js"
+
+function correctionFromConfig(step) { 
+    if (step == "1D") return conf.correction.oneDay
+    else if (step == "240") return conf.correction.forHours
+    else if (step == "60") return conf.correction.oneHour
+    else return 0
+ }
+
 // used in formLines function
 // 86400000 one day in milliseconds, needed because of Team Wiever error
-function convertDateFromUnixTimestamp(unixTimestamp, addDays) {
-    var date = new Date(unixTimestamp * 1000 + 86400000 * addDays);
+function convertDateFromUnixTimestamp(unixTimestamp, step) {
+    var date = new Date(unixTimestamp * 1000 + correctionFromConfig(step));
     return "[" + date.toLocaleDateString("en-UK") + "]"
 }
       
-function convertTimeFromUnixTimestamp(unixTimestamp, addDays) {
-    var date = new Date(unixTimestamp * 1000 + 86400000 * addDays);
+function convertTimeFromUnixTimestamp(unixTimestamp, step) {
+    var date = new Date(unixTimestamp * 1000 + correctionFromConfig(step));
     return "[" + date.toLocaleTimeString("en-UK") + "]"
+}
+
+function getWeekdayFromUnixTimestamp(unixTimestamp, step) {
+    var date = new Date(unixTimestamp * 1000 + correctionFromConfig(step));
+    var weekdays = ["Su","Mo","Tu","We","Th","Fr","Sa",]
+    return weekdays[date.getDay()]
 }
 
 function dateToYear(date) {
@@ -16,12 +31,6 @@ function dateToYear(date) {
 
 function dateToMonth(date) {
     return date.split("/")[1]
-}
-
-function getWeekdayFromUnixTimestamp(unixTimestamp, addDays) {
-    var date = new Date(unixTimestamp * 1000 + 86400000 * addDays);
-    var weekdays = ["Su","Mo","Tu","We","Th","Fr","Sa",]
-    return weekdays[date.getDay()]
 }
 
 // used in rawOutput

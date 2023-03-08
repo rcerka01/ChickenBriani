@@ -7,7 +7,7 @@ async function getData(postfix, currency, step, yearFrom, yearTo, isSimple) {
   if (postfix !== undefined) var tail = postfix; else var tail = ""
   var path = conf.fileName.path + conf.fileName.prefix + currency + conf.fileName.join + step + tail + ".csv"
   var currencyData = conf.mapper.find(c => c.name == currency)
-  var items = await dataController.readFile(path, yearFrom, yearTo, isSimple)
+  var items = await dataController.readFile(path, yearFrom, yearTo, isSimple, step)
   return { days: items.days, currencyData }
 }
 

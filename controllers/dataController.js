@@ -10,13 +10,13 @@ function fix5(n) { return Number(n).toFixed(5) }
 /*
  * Public
  */
-const readFile = async (path, yearFrom, yearTo, isSimple) => {
+const readFile = async (path, yearFrom, yearTo, isSimple, step) => {
     try {
         const data = await fs.promises.readFile(path, 'utf8')
         var dataArray = data.split(/\r?\n/);
         dataArray.shift();
-        if (isSimple) return formLinesSimple(dataArray, yearFrom, yearTo)
-        else return formLines(dataArray, yearFrom, yearTo)
+        if (isSimple) return formLinesSimple(dataArray, yearFrom, yearTo, step)
+        else return formLines(dataArray, yearFrom, yearTo, step)
     }
     catch (err) {
         console.log(err)
@@ -26,7 +26,7 @@ const readFile = async (path, yearFrom, yearTo, isSimple) => {
 /*
  * For lower time step
  */
-function formLinesSimple(dataArray, yearFrom, yearTo) {
+function formLinesSimple(dataArray, yearFrom, yearTo, step) {
     var days = []
 
     dataArray.forEach( line => {
@@ -34,8 +34,8 @@ function formLinesSimple(dataArray, yearFrom, yearTo) {
         var lineArr = line.split(",") 
 
         var ts           = lineArr[0]
-        var date         = com.convertDateFromUnixTimestamp(Number(ts), 0)
-        var time         = com.convertTimeFromUnixTimestamp(Number(ts), 0)
+        var date         = com.convertDateFromUnixTimestamp(Number(ts), step)
+        var time         = com.convertTimeFromUnixTimestamp(Number(ts), step)
         var currentClose = lineArr[4]
         var high         = lineArr[2]
         var low          = lineArr[3]
@@ -51,7 +51,7 @@ return { days }
 /*
  * Main, 1D time step
  */
-function formLines(dataArray, yearFrom, yearTo) {
+function formLines(dataArray, yearFrom, yearTo, step) {
     var direction     = ""
     var directionFlag = ""
     var days = []
@@ -105,9 +105,9 @@ function formLines(dataArray, yearFrom, yearTo) {
         var currentGreenSignal = lineArr[8]
 
         var ts  = lineArr[0]
-        var convertedDate = com.convertDateFromUnixTimestamp(Number(ts), 1)
-        var convertedTime = com.convertTimeFromUnixTimestamp(Number(ts), 1)
-        var weekday       = com.getWeekdayFromUnixTimestamp(Number(ts), 1)
+        var convertedDate = com.convertDateFromUnixTimestamp(Number(ts), step)
+        var convertedTime = com.convertTimeFromUnixTimestamp(Number(ts), step)
+        var weekday       = com.getWeekdayFromUnixTimestamp(Number(ts), step)
 
         if (com.dateToYear(convertedDate) >= yearFrom && com.dateToYear(convertedDate) <= yearTo) {
             // to check if last linecan be closed
@@ -315,6 +315,7 @@ function takeProfits(data, lowerData, lowerStep, sp, tp, sl) {
                             break; 
                         }
 
+                        // add sl
                         if (lowDiff <= sl) {
                             // output
                             slOrTp      = "sl"; 

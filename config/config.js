@@ -18,6 +18,12 @@ export default {
         path: envConf.default.filePath
     },
 
+    correction: {
+        oneDay: 86400000,
+        forHours: 14400000,
+        oneHour: 3600000
+    },
+
     lowerTimeSplitKey: "[22:00:00]",
     secondaryLowerTimeSplitKey: "[21:00:00]",
 
